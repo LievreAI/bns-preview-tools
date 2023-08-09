@@ -6,7 +6,6 @@ public sealed class Faction : BaseRecord
 {
 	public Text Name2;
 
-	[Signal("tag-name")]
 	public Text TagName;
 
 

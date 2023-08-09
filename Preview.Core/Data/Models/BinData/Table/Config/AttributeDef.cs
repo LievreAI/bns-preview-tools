@@ -21,8 +21,6 @@ public sealed class AttributeDef : AttributeDefinition
 	public bool Server { get; set; } = true;
 
 	public bool Client { get; set; } = true;
-
-	public ErrorType ErrorType;
 	#endregion
 
 	#region Interface
@@ -37,8 +35,6 @@ public sealed class AttributeDef : AttributeDefinition
 
 		var Name = node.Attributes["name"]?.Value?.Trim();
 		ArgumentNullException.ThrowIfNull(Name);
-
-		Enum.TryParse<ErrorType>(node.Attributes["error-type"]?.Value, true, out var ErrorType);
 
 		#region Type & Ref
 		var TypeName = node.Attributes["type"]?.Value;
@@ -185,8 +181,6 @@ public sealed class AttributeDef : AttributeDefinition
 			Sequence = seqdef?.Sequence ?? new List<string>(),
 			SequenceDef = seqdef,
 
-
-			ErrorType = ErrorType,
 			Server = node.Attributes["server"]?.Value.ToBool() ?? true,
 			Client = node.Attributes["client"]?.Value.ToBool() ?? true,
 			CanInput = node.Attributes["input"]?.Value.ToBool() ?? true,

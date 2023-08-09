@@ -50,7 +50,7 @@ public class Acquisition : CaseParent
 	[Signal("faction-reputation")] 
 	public int FactionReputation;
 
-	[Signal("job"), Repeat(15)]
+	[Repeat(15)]
 	public JobSeq[] Job;
 
 	[DefaultValue(null)]

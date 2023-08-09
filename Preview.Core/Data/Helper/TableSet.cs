@@ -188,8 +188,7 @@ public class TableSet : IDisposable
 	{
 		if (Tables is not null) return;
 
-
-		var _provider = new DefaultProvider(Folder ?? CommonPath.GameFolder);
+		var _provider = DefaultProvider.Load(Folder ?? CommonPath.GameFolder);
 		this.Provider = _provider;
 		if (!UseDB) return;
 

@@ -1,5 +1,6 @@
 ﻿using System.Web;
 using System.Windows;
+using System.Xml;
 
 using Xylia.Extension;
 using Xylia.Preview.Common.Arg;
@@ -13,7 +14,11 @@ public partial class Game_CharacterInfo_Scene : Window
 	public Game_CharacterInfo_Scene()
 	{
 		InitializeComponent();
-		InitUrl();
+
+		FileCache.Data.LoadData(false);
+		XmlDoc = (FileCache.Data.Provider as DefaultProvider).ConfigData.EnumerateFiles("release.config2.xml").FirstOrDefault()?.Xml.Nodes;
+
+		InitUrl(new Creature() { WorldId = 1911, Name = "天靑色等煙雨乀" });
 	}
 
 	private async void WebView_WebBrowserInitialized(object sender, EventArgs e)
@@ -44,12 +49,13 @@ onmouseover = (e) => {
 	}
 
 
-	public void InitUrl()
-	{
-		FileCache.Data.LoadData(false);
-		var doc = (FileCache.Data.Provider as DefaultProvider).ConfigData.EnumerateFiles("release.config2.xml").FirstOrDefault()?.Xml.Nodes;
 
-		var group = doc.SelectSingleNode("config/group[@name='in-game-web']");
+	XmlDocument XmlDoc;
+
+	public void InitUrl(Creature creature)
+	{
+		var group = XmlDoc.SelectSingleNode("config/group[@name='in-game-web']");
+
 		var CharacterInfoUrl = group.SelectSingleNode("./option[@name='character-info-url']").GetValue();
 		var CharacterInfoUrl2 = group.SelectSingleNode("./option[@name='character-info-url-2']").GetValue();
 
@@ -57,8 +63,6 @@ onmouseover = (e) => {
 		var CharacterInfoOtherHomeUrn = group.SelectSingleNode("./option[@name='character-info-other-home-urn']").GetValue();
 		var CharacterInfoDiffHomeUrn = group.SelectSingleNode("./option[@name='character-info-diff-home-urn']").GetValue();
 
-
-		var role = new Creature() { WorldId = 1911, Name = "天靑色等煙雨乀" };
-		WebView.Source = new UriBuilder(CharacterInfoUrl.Replace("%s", role.WorldId.ToString()[..2]) + CharacterInfoHomeUrn) { Query = $"c={role.Name}&s={role.WorldId}" }.Uri;
+		WebView.Source = new UriBuilder(CharacterInfoUrl.Replace("%s", creature.WorldId.ToString()[..2]) + CharacterInfoHomeUrn) { Query = $"c={creature.Name}&s={creature.WorldId}" }.Uri;
 	}
 }

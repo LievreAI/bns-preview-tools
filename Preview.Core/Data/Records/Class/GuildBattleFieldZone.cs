@@ -5,16 +5,12 @@ namespace Xylia.Preview.Data.Record;
 [AliasRecord]
 public sealed class GuildBattleFieldZone : BaseRecord, IAttraction
 {
-	[Signal("guild-battle-field-zone-name2")]
 	public Text GuildBattleFieldZoneName2;
 
-	[Signal("guild-battle-field-zone-desc")]
 	public Text GuildBattleFieldZoneDesc;
 
-	[Signal("thumbnail-image")]
 	public string ThumbnailImage;
 
-	[Signal("reward-summary")]
 	public AttractionRewardSummary RewardSummary;
 
 

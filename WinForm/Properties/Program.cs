@@ -8,7 +8,7 @@ using log4net;
 using log4net.Config;
 
 using Vanara.PInvoke;
-				   using Xylia.Preview.UI.Extension; 
+
 using Xylia.Extension;
 using Xylia.Match.Windows.Panel;
 using Xylia.Preview.Data.Helper;
@@ -37,6 +37,7 @@ public static partial class Program
 		#region WinExe
 		if (!_flagValue.TryGetValue("command", out string command))
 		{
+			Application.SetHighDpiMode(HighDpiMode.SystemAware);
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
 			Application.SetUnhandledExceptionMode(UnhandledExceptionMode.ThrowException);

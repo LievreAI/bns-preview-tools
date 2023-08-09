@@ -1,9 +1,12 @@
-﻿using Xylia.Extension;
+﻿using System.Windows.Forms;
+
+using Xylia.Extension;
 
 namespace Xylia.Preview.Data.Models.Definition;
 public class XList
 {
-    public ushort Version = 1;
+	#region Fields
+	public ushort Version = 1;
     public ushort Type;
 
     public bool IsCompressed;
@@ -14,9 +17,9 @@ public class XList
     public string Title = "";
 
     public List<int> datas = new();
+	#endregion
 
-
-    public void Load(string path)
+	public void Load(string path)
     {
         if (string.IsNullOrWhiteSpace(path))
             return;
@@ -67,10 +70,9 @@ public class XList
     }
 
 
-
     public static HashSet<int> LoadData()
     {
-        OpenFileDialog fileDialog = new()
+		OpenFileDialog fileDialog = new()
         {
             Filter = "|*.chv",
             RestoreDirectory = false

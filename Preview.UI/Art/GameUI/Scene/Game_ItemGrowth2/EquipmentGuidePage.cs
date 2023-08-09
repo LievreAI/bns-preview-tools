@@ -26,7 +26,7 @@ public partial class EquipmentGuidePage : UserControl
 			this.MyWeapon_Icon.Image = value.Icon();
 			this.MyWeapon_Name.Text = value.Name2;
 			this.MyWeapon_Name.ItemGrade = value.ItemGrade;
-			this.MyWeapon_Name.Location = new Point(this.MyWeapon_Icon.Left + (this.MyWeapon_Icon.Width - this.MyWeapon_Name.Width) / 2, this.MyWeapon_Name.Top);
+			this.MyWeapon_Name.Location = new Point(this.MyWeapon_Icon.Left + (this.MyWeapon_Icon.Bounds.Width - this.MyWeapon_Name.Width) / 2, this.MyWeapon_Name.Top);
 		}
 	}
 	#endregion

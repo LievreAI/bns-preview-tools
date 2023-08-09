@@ -102,9 +102,9 @@ public partial class Game_QuestJournalScene : PreviewFrm
 			this.Quest_ICON.SetToolTip("此类型为副本进度任务");
 
 			List<string> DifficultyType = new();
-			if (value.ProgressDifficultyType1) DifficultyType.Add("入门");
-			if (value.ProgressDifficultyType2) DifficultyType.Add("普通");
-			if (value.ProgressDifficultyType3) DifficultyType.Add("熟练");
+			if (value.ProgressDifficultyType[0]) DifficultyType.Add("入门");
+			if (value.ProgressDifficultyType[1]) DifficultyType.Add("普通");
+			if (value.ProgressDifficultyType[2]) DifficultyType.Add("熟练");
 
 
 			if (DifficultyType.Any())

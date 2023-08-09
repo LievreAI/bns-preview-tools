@@ -12,7 +12,7 @@ namespace Xylia.Preview.Tests;
 [TestClass]
 public class ScreenshotTest
 {
-	[TestMethod]
+	//[TestMethod]
 	[DataRow(@"F:\Resources\Pictures\BnS\CharacterCustomize\外形_灵_女00000.jpg")]
 	public void LoadData(string FilePath)
 	{

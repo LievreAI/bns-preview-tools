@@ -31,7 +31,7 @@ the function has some defects, carefuly.
 
 Environment
 ==========================
-.NET 6.0 SDK    
+.NET 7.0 SDK    
 Windows 7 above
 
 

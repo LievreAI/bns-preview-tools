@@ -73,13 +73,17 @@
     <PackageReference Include="CUE4Parse-Conversion" Version="1.0.10" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.51" />
     <PackageReference Include="HZH_Controls-lib" Version="2.0.0.5" />
-    <PackageReference Include="LiveCharts.WinForms" Version="0.9.7.1" />
-    <PackageReference Include="LiveCharts.Wpf" Version="0.9.7" />
     <PackageReference Include="log4net" Version="2.0.15" />
     <PackageReference Include="LiveCharts" Version="0.9.7">
       <NoWarn>NU1701;NU1702</NoWarn>
     </PackageReference>
-    <PackageReference Include="Xylia" Version="1.0.4.43" />
+    <PackageReference Include="LiveCharts.WinForms" Version="0.9.7.1" >
+      <NoWarn>NU1701;NU1702</NoWarn>
+    </PackageReference>
+    <PackageReference Include="LiveCharts.Wpf" Version="0.9.7" >
+      <NoWarn>NU1701;NU1702</NoWarn>
+    </PackageReference>
+    <PackageReference Include="Xylia" Version="1.0.4.45" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BNSBIN\Src\BnsBinTool.Core\BnsBinTool.Core.csproj" />

@@ -1,42 +1,22 @@
-﻿using Xylia.Configure;
+﻿using System.IO;
+
+using Xylia.Configure;
 using Xylia.Extension;
+using Xylia.Preview.Data.Models.DatData.DataProvider;
 using Xylia.Preview.Data.Models.DatData.DatDetect;
+using Xylia.Windows.CustomException;
 
 namespace Xylia.Preview.Data.Models.DatData;
-public partial class DatSelect : Form
+public partial class DatSelect : Form, IDatSelect
 {
 	#region Fields
-	private readonly IEnumerable<FileInfo> list_xml;
-	private readonly IEnumerable<FileInfo> list_local;
+	public DatSelect() => InitializeComponent();
 
+	private IEnumerable<FileInfo> list_xml;
+	private IEnumerable<FileInfo> list_local;
 
 	public string XML_Select;
-
 	public string Local_Select;
-	#endregion
-
-	#region Constructor
-	public DatSelect(IEnumerable<FileInfo> Xml, IEnumerable<FileInfo> Local)
-	{
-		InitializeComponent();
-
-		this.list_xml = Xml;
-		this.list_local = Local;
-		this.Chk_64bit.Checked = Ini.ReadValue("DatSelect", "64bit").ToBool();
-
-		#region 判断是否禁用切换
-		if (!Xml.Has32bit() && !Local.Has32bit())
-		{
-			Chk_64bit.Enabled = false;
-			Chk_64bit.Checked = true;
-		}
-		else if (!Xml.Has64bit() && !Local.Has64bit())
-		{
-			Chk_64bit.Enabled = false;
-			Chk_64bit.Checked = false;
-		}
-		#endregion
-	}
 	#endregion
 
 	#region Functions (UI)
@@ -87,19 +67,14 @@ public partial class DatSelect : Form
 	{
 		Cmb.Items.Clear();
 
-		//item sort
-		var Pathes = FileCollection.GetFiles(this.Chk_64bit.Checked).Select(f => f.FullName).ToList();
-		Pathes.ForEach(w =>
+		foreach (var w in FileCollection.GetFiles(this.Chk_64bit.Checked).Select(f => f.FullName))
 		{
-			//hide back files
-			if (Chk_HidenBpFiles.Checked)
-			{
-				if (!(w.Contains("backup") || w.Contains("备份")))
-					Cmb.Items.Add(w.Replace(@"contents\Local", "..."));
-			}
-			else Cmb.Items.Add(w.Replace(@"contents\Local", "..."));
-		});
+			var s = w.Replace(@"contents\Local", "...");
 
+			//hide back files
+			if (!Chk_HidenBpFiles.Checked) Cmb.Items.Add(s);
+			else if (!s.Contains("backup")) Cmb.Items.Add(s);
+		}
 
 		if (Cmb.Items.Count > 0) Cmb.Text = Cmb.Items[0].ToString();
 
@@ -107,9 +82,7 @@ public partial class DatSelect : Form
 	}
 	#endregion
 
-
-
-	#region 倒计时控制块
+	#region Functions (CountDown)
 	/// <summary>
 	/// 最后活动时间
 	/// </summary>
@@ -131,9 +104,6 @@ public partial class DatSelect : Form
 	readonly int NoResponseSec = 15;
 
 
-	/// <summary>
-	/// 开始倒计时
-	/// </summary>
 	private void StartCountDown()
 	{
 		TimeInfo.Text = null;
@@ -156,11 +126,6 @@ public partial class DatSelect : Form
 		this.NoResponse.Enabled = true;
 	}
 
-	/// <summary>
-	/// 长时间无响应控制器
-	/// </summary>
-	/// <param name="sender"></param>
-	/// <param name="e"></param>
 	private void NoResponse_Tick(object sender, EventArgs e)
 	{
 		int CurNoResponseSec = (int)DateTime.Now.Subtract(LastActTime).TotalSeconds;
@@ -171,11 +136,6 @@ public partial class DatSelect : Form
 		}
 	}
 
-	/// <summary>
-	/// 控制器
-	/// </summary>
-	/// <param name="sender"></param>
-	/// <param name="e"></param>
 	private void Timer_Tick(object sender, EventArgs e)
 	{
 		int RemainSec = CountDownSec - (int)DateTime.Now.Subtract(dt).TotalSeconds;
@@ -185,4 +145,34 @@ public partial class DatSelect : Form
 		if (RemainSec <= 0) Btn_Confirm_Click(null, null);
 	}
 	#endregion
+
+
+
+	public DefaultProvider Show(IEnumerable<FileInfo> Xml, IEnumerable<FileInfo> Local)
+	{
+		this.list_xml = Xml;
+		this.list_local = Local;
+		this.Chk_64bit.Checked = Ini.ReadValue("DatSelect", "64bit").ToBool();
+
+		if (!Xml.Has32bit() && !Local.Has32bit())
+		{
+			Chk_64bit.Enabled = false;
+			Chk_64bit.Checked = true;
+		}
+		else if (!Xml.Has64bit() && !Local.Has64bit())
+		{
+			Chk_64bit.Enabled = false;
+			Chk_64bit.Checked = false;
+		}
+
+
+
+		if (this.ShowDialog() != DialogResult.OK) throw new UserExitException();
+		else return new DefaultProvider()
+		{
+			is64Bit = Chk_64bit.Checked,
+			XmlData = XML_Select,
+			LocalData = Local_Select,
+		};
+	}
 }

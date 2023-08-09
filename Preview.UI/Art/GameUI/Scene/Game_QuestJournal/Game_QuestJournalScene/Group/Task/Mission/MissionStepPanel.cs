@@ -62,7 +62,7 @@ public partial class MissionStepPanel : UserControl
 		int y = 0;
 		if (this.MissionDemand.Visible) y = this.MissionDemand.Bottom;
 
-		foreach (var MissionCtl in this.Controls.OfType<MissionPanel>().OrderBy(c => (byte)c.Tag))
+		foreach (var MissionCtl in this.Controls.OfType<MissionPanel>().OrderBy(c => (sbyte)c.Tag))
 		{
 			MissionCtl.Location = new Point(15, y);
 			MissionCtl.Refresh();

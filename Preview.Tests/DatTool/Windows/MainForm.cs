@@ -7,6 +7,7 @@ using Xylia.Extension;
 using Xylia.Preview.Data.Models.BinData;
 using Xylia.Preview.Data.Models.BinData.Table.Config;
 using Xylia.Preview.Data.Models.DatData;
+using Xylia.Preview.Data.Models.DatData.DataProvider;
 using Xylia.Preview.Data.Models.DatData.DatDetect;
 using Xylia.Preview.Data.Models.DatData.Third;
 using Xylia.Preview.Data.Models.Util.Sort;
@@ -270,7 +271,7 @@ public partial class MainForm : Form
 					FolderPath = outdir,
 					PackagePath = txbDatFile.Text,
 					Bit64 = txbDatFile.Text.Judge64Bit(),
-					CompressionLevel = (bnscompression.CompressionLevel)this.trackBar1.Value,
+					CompressionLevel = (BnsCompression.CompressionLevel)this.trackBar1.Value,
 				};
 
 				if (checkBox1.Checked) MySpport.Pack(param);
@@ -368,21 +369,20 @@ public partial class MainForm : Form
 	{
 		if (MessageBox.Show("即将开始提取数据，是否确认?", "确认", MessageBoxButtons.OKCancel, MessageBoxIcon.Information) != DialogResult.OK) return;
 
-		Thread thread = null;
-		thread = new Thread(act =>
+		Task.Run(() =>
 		{
 			try
 			{
-				var GetDataPath = new DataDetector(Txt_Bin_Data.Text, this.checkBox13.Checked ? ResultMode.SelectBin : ResultMode.SelectDat);
-				string OutFolder = Path.GetDirectoryName(GetDataPath.XmlData.Path) +
-					@"\Export\" + Path.GetFileNameWithoutExtension(GetDataPath.XmlData.Path) + @"\json\";
+				var provider = DefaultProvider.Load(Txt_Bin_Data.Text, this.checkBox13.Checked ? ResultMode.SelectBin : ResultMode.SelectDat);
+				var folder = string.Concat(Path.GetDirectoryName(provider.XmlData.Path), @"\Export\",
+					Path.GetFileNameWithoutExtension(provider.XmlData.Path) , @"\json\");
 
 
-				var data = GetDataPath.XmlData.ExtractBin();
+				var data = provider.XmlData.ExtractBin();
 				var detect = new DatafileDetect();
 				detect.Detect(data);
 
-				data.Tables.Dump(detect, OutFolder, new ExportOption()
+				data.Tables.Dump(detect, folder, new ExportOption()
 				{
 					OutputFieldAlias = true,
 					OutputListAlias = true
@@ -399,8 +399,6 @@ public partial class MainForm : Form
 
 			GC.Collect();
 		});
-
-		thread.Start();
 	}
 
 	private void button16_Click(object sender, EventArgs e)

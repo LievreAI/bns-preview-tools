@@ -33,10 +33,8 @@ public static class TableDefinitionEx
 		foreach (XmlElement el in tableNode.SelectNodes("./el"))
 		{
 			#region head
-			var name = el.Attributes["name"]?.Value;
-
-			ElDefinition def = name == "record" ? new TableDefinition() : new ElDefinition();
-			def.Name = name;
+			var def = new TableDefinition();   // should use ElDefinition
+			def.Name = el.Attributes["name"]?.Value;
 
 			var child = el.Attributes["child"]?.Value;
 			if (child != null) def.Children.AddRange(child.Split(',').Select(ushort.Parse));
@@ -154,7 +152,11 @@ public static class TableDefinitionEx
 		#endregion
 
 		#region table
-		var table = (els.FirstOrDefault(el => el.Name == "record") as TableDefinition) ?? new TableDefinition { IsEmpty = true };
+		var documentElement = els.FirstOrDefault();
+
+		var table = 
+			(TableDefinition)els.ElementAtOrDefault(documentElement.Children.FirstOrDefault()) ?? 
+			new TableDefinition { IsEmpty = true };
 		table.Type = Type ?? 0;
 		table.Name = TypeName;
 		table.OriginalName = TypeName;
@@ -229,6 +231,10 @@ public static class TableDefinitionEx
 
 		return (ushort)Offset.Align(4);
 	}
+
+
+
+
 	#endregion
 
 

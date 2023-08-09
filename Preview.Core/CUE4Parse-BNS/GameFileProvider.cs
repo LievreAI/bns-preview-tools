@@ -129,7 +129,14 @@ public sealed class GameFileProvider : DefaultFileProvider, IDisposable
 		objectPath = FixPath(objectPath, true);
 		if (objectPath is null) return null;
 
-		return await base.LoadObjectAsync(objectPath);
+		try
+		{
+			return await base.LoadObjectAsync(objectPath);
+		}
+		catch
+		{
+			return null;
+		}
 	}
 
 	public override async Task<T> LoadObjectAsync<T>(string objectPath)

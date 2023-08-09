@@ -16,6 +16,7 @@ using Xylia.Preview.Data.Models.BinData.Table.Record.Attributes;
 using Xylia.Preview.Data.Models.DatData.DataProvider;
 using Xylia.Preview.Data.Record;
 using Xylia.Preview.Properties;
+using Xylia.Windows.CustomException;
 using Xylia.Xml;
 
 using RecordModel = BnsBinTool.Core.Models.Record;
@@ -27,7 +28,7 @@ public class Table<T> : IEnumerable<T>, ITable where T : BaseRecord, new()
 {
 	#region Constructor
 	public string Name { get; set; }
-	public TableSet Owner{ get; set; }
+	public TableSet Owner { get; set; }
 	public TableDefinition TableDef { get; set; }
 
 
@@ -111,12 +112,11 @@ public class Table<T> : IEnumerable<T>, ITable where T : BaseRecord, new()
 
 					Trace.WriteLine($"[{DateTime.Now}] load table `{Name}` successful ({this._data.Length})");
 				}
-				catch (ConfigurationErrorsException)
-				{
-					throw;
-				}
 				catch (Exception ex)
 				{
+					if (ex is ConfigurationErrorsException or UserExitException)
+						throw;
+
 					this._data = Array.Empty<Lazy<T>>();
 					Trace.WriteLine($"[{DateTime.Now}] load table `{Name}` failed: {ex}");
 				}
@@ -152,7 +152,7 @@ public class Table<T> : IEnumerable<T>, ITable where T : BaseRecord, new()
 		foreach (var xml in xmls)
 		{
 			var root = xml.DocumentElement;
-			tables.AddRange(root.SelectNodes($"./" + TableDef.Els[1].Name).OfType<XmlElement>());
+			tables.AddRange(root.SelectNodes($"./" + TableDef.Name).OfType<XmlElement>());
 		}
 
 
@@ -198,10 +198,10 @@ public class Table<T> : IEnumerable<T>, ITable where T : BaseRecord, new()
 			TableDefinitionEx.CheckSize(TableDef, table, (msg) => Debug.WriteLine(msg));
 
 
-#pragma warning disable IDE0150 
+#pragma warning disable IDE0150
 			if (Settings.TestMode == DumpMode.Used && this.Owner is TableSet)
 				ProcessTable(CommonPath.DataFiles);
-#pragma warning restore IDE0150 
+#pragma warning restore IDE0150
 
 
 			var aliasAttrDef = TableDef["alias"];

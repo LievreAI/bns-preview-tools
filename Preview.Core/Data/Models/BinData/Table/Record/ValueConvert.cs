@@ -1,4 +1,6 @@
-﻿using Xylia.Extension;
+﻿using BnsBinTool.Core.DataStructs;
+
+using Xylia.Extension;
 using Xylia.Preview.Common.Attribute;
 using Xylia.Preview.Common.Cast;
 using Xylia.Preview.Common.Struct;
@@ -53,8 +55,15 @@ public static class ValueConvert
 
 			return obj;
 		}
-		else if (type == typeof(Msec)) return new Msec(int.Parse(value));	/// <see cref="AttributeType.TMsec">
-		else if (type == typeof(FPath)) return new FPath(value);			/// <see cref="AttributeType.TXUnknown2">
+																			/// <see cref="AttributeType.TVector16">
+																			/// <see cref="AttributeType.TVector32">
+		else if (type == typeof(IColor)) return IColor.Parse(value);        /// <see cref="AttributeType.TIColor">
+																			/// <see cref="AttributeType.TFColor">
+		else if (type == typeof(Box)) return Box.Parse(value);              /// <see cref="AttributeType.TBox">
+																			/// <see cref="AttributeType.TAngle">
+		else if (type == typeof(Msec)) return new Msec(int.Parse(value));   /// <see cref="AttributeType.TMsec">
+		else if (type == typeof(Script_obj)) return new Script_obj(value);  /// <see cref="AttributeType.TScript_obj">
+		else if (type == typeof(FPath)) return new FPath(value);            /// <see cref="AttributeType.TXUnknown2">
 
 
 		throw new NotSupportedException($"type not supported: {type}");

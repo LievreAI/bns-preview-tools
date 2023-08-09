@@ -84,7 +84,6 @@ public class UBnsCustomImageWidget : UBnsCustomWidget
 	public BaseImage BaseImageProperty;
 
 	public bool bNeverActivate;
-	public bool bIsVariable;
 
 	public bool EnableResourceSize;
 }

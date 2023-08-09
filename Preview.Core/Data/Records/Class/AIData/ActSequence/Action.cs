@@ -20,7 +20,7 @@ public abstract class Action : BaseRecord
 	{
 		public bool hide;
 
-		public sbyte Social;
+		public sbyte social;
 	}
 
 	public sealed class IndexedMovearound : MovearoundBase
@@ -37,7 +37,7 @@ public abstract class Action : BaseRecord
 	{
 		public long Duration;
 
-		public sbyte Social;
+		public sbyte social;
 	}
 
 	public sealed class Loop : Action
@@ -48,8 +48,6 @@ public abstract class Action : BaseRecord
 		[Signal("min-count")]
 		public int MinCount;
 	}
-
-
 
 
 	public abstract class MovearoundBase : Action

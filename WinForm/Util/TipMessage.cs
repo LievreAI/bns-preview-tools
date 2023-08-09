@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Xml;
+﻿using System.Xml;
 
 using Xylia.Extension;
 
@@ -19,7 +18,7 @@ public class TipMessage
 			var tip = new TipInfo()
 			{
 				Text = item.Attributes["text"]?.Value,
-				Type = item.Attributes["module"]?.Value.ToEnum<TipInfo.type>() ?? default,
+				Type = item.Attributes["module"]?.Value.ToEnum<TipInfo.TipType>() ?? default,
 			};
 
 
@@ -54,14 +53,12 @@ public class TipMessage
 public class TipInfo
 {
 	public string Text;
-	public type Type;
+	public TipType Type;
 
-	public enum type
+	public enum TipType
 	{
 		None,
-
 		Prop,
-
 		Quest,
 	}
 }

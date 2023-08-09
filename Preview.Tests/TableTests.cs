@@ -52,10 +52,13 @@ public class TableTests
 
 
 
-	//[TestMethod]
+	[TestMethod]
 	public void Test2()
 	{
-		ClientConfiguration.LoadFrom();
+		var table =  ClientConfiguration.LoadFrom();
+		table.Test();
+
+
 
 		//foreach (var record in Data.FileCache.Data.TextData.Where(r => 
 		//	r.alias.StartsWith("UI.ItemTooltip.") ||
@@ -93,7 +96,7 @@ public sealed class TestSet : TableSet
 	{
 		if (Tables is not null) return;
 
-		var _provider = new DefaultProvider(Folder ?? CommonPath.GameFolder);
+		var _provider = DefaultProvider.Load(Folder ?? CommonPath.GameFolder);
 		this.Provider = _provider;
 
 		var data = _provider.XmlData.ExtractBin();

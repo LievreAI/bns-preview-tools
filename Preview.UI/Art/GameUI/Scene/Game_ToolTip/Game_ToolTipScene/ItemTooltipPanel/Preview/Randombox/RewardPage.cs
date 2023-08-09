@@ -111,7 +111,7 @@ internal sealed class RewardPage
     {
         var items = new Item[Num];
         Linq.For(ref items, (i) => FileCache.Data.Item[func(i)]);
-        Array.Sort(items, new comparer());
+        Array.Sort(items, new RewardItemComparer());
 
 
         var font = new Font("Microsoft YaHei UI", 14F);
@@ -171,7 +171,7 @@ internal sealed class RewardPage
 }
 
 
-public class comparer : IComparer<Item>
+public class RewardItemComparer : IComparer<Item>
 {
     public int Compare(Item x, Item y)
     {

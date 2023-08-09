@@ -12,13 +12,10 @@ public sealed class JobStyle : BaseRecord
 	public JobStyleSeq jobStyle;
 
 
-	[Signal("introduce-job-style-icon")]
 	public string IntroduceJobStyleIcon;
 
-	[Signal("introduce-job-style-name")]
 	public Text IntroduceJobStyleName;
 
-	[Signal("introduce-job-style-play-desc")]
 	public Text IntroduceJobStylePlayDesc;
 
 }

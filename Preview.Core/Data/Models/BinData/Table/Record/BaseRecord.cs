@@ -104,7 +104,7 @@ public class BaseRecord
 			}
 
 
-			var name = field.GetSignal().ToLower();
+			var name = field.GetSignal().TitleLowerCase();
 			var repeat = field.GetAttribute<Repeat>()?.Value ?? 1;
 			if (repeat == 1)
 			{
@@ -115,16 +115,14 @@ public class BaseRecord
 			{
 				_attrs.Add($"{name}-{repeat}");
 
-				if (memberType.IsArray)
-				{
-					var type = memberType.GetElementType();
+				if (!memberType.IsArray)
+					throw new ConfigurationErrorsException($"Repeatable object must to use array type: {this.GetType()} -> {name}");
 
-					var value = Array.CreateInstance(type, repeat);
-					Linq.For(repeat, (idx) => value.SetValue(ValueConvert.Construct(type, Attributes[name, idx + 1]), idx));
+				var type = memberType.GetElementType();
+				var value = Array.CreateInstance(type, repeat);
+				Linq.For(repeat, (idx) => value.SetValue(ValueConvert.Construct(type, Attributes[name, idx + 1]), idx));
 
-					field.SetValue(this, value);
-				}
-				else throw new ConfigurationErrorsException($"Repeatable object must to use array type: {this.GetType()} -> {name}");
+				field.SetValue(this, value);
 			}
 		}
 
@@ -214,7 +212,7 @@ public class BaseRecord
 
 		// get attributes from instance if doesn't exist 
 		_attributes ??= new XElementData(Serialize(ReleaseSide.Client));
-	
+
 		// Create record builder if it doesn't exist
 		_recordBuilder ??= table.Owner.converter.Builder;
 		_recordBuilder.InitializeRecord();
