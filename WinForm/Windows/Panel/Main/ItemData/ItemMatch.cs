@@ -56,8 +56,8 @@ public sealed class ItemMatch
 		CreatedAt = set.CreatedAt;
 
 
-		set.Item.TryLoad();
-		set.Text.TryLoad();
+		set.Item.Load();
+		set.Text.Load();
 
 		var InfoGet = new InfoGet(set);
 		this.Failures = new();

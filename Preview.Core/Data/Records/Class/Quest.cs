@@ -38,17 +38,11 @@ public sealed class Quest : BaseRecord
 	[Side(ReleaseSide.Client)]
 	public Text Name2;
 
-	[Signal("district-1")]
-	public District District1;
+	[Repeat(2)]
+	public District[] District;
 
-	[Signal("district-2")]
-	public District District2;
-
-	[Signal("map-group-1-1")]
-	public MapGroup1 Map_Group_1_1;
-
-	[Signal("map-group-1-2")]
-	public MapGroup1 Map_Group_1_2;
+	[Signal("map-group-1"), Repeat(2)]
+	public MapGroup1[] Map_Group_1;
 
 	[Side(ReleaseSide.Client)]
 	public string Group;
@@ -147,7 +141,7 @@ public sealed class Quest : BaseRecord
 
 	public bool Retired;
 
-	[Repeat(3) , DefaultValue(true)]
+	[Repeat(3), DefaultValue(true)]
 	public bool[] ProgressDifficultyType;
 
 	[DefaultValue(true)]
@@ -164,10 +158,10 @@ public sealed class Quest : BaseRecord
 	[Obsolete]
 	public bool ResetMoney;
 
-	[Repeat(value: 4) , Obsolete]
+	[Repeat(4), Obsolete]
 	public Item[] ResetItem;
 
-	[Repeat(value: 4), Obsolete]
+	[Repeat(4), Obsolete]
 	public sbyte[] ResetItemCount;
 
 	[Side(ReleaseSide.Client)]
@@ -195,7 +189,6 @@ public sealed class Quest : BaseRecord
 	public sbyte ValidTimeStartHour;
 	public sbyte ValidTimeEndHour;
 
-
 	public bool ValidDayofweekSun;
 	public bool ValidDayofweekMon;
 	public bool ValidDayofweekTue;
@@ -221,11 +214,10 @@ public sealed class Quest : BaseRecord
 	public ContentsReset ContentsReset;
 
 
-
 	[DefaultValue(BroadcastCategory.None)]
 	public BroadcastCategory BroadcastCategory;
 
-	[Repeat(3) , Side(ReleaseSide.Server)]
+	[Repeat(3), Side(ReleaseSide.Server)]
 	public Achievement[] ExtraQuestCompleteAchievement;
 
 	[Side(ReleaseSide.Server)]
@@ -299,7 +291,6 @@ public sealed class Quest : BaseRecord
 	}
 	#endregion
 
-
 	#region Functions
 	public override void LoadData(XmlElement data)
 	{
@@ -329,7 +320,7 @@ public sealed class Quest : BaseRecord
 		foreach (var NextQuest in Completion.NextQuest)
 		{
 			var jobs = NextQuest.Job;
-			if(jobs is null || jobs[0] == JobSeq.JobNone || jobs.FirstOrDefault(job => job == TargetJob) != JobSeq.JobNone)
+			if (jobs is null || jobs[0] == JobSeq.JobNone || jobs.FirstOrDefault(job => job == TargetJob) != JobSeq.JobNone)
 				GetEpic(NextQuest.Quest?.alias, act, TargetJob);
 		}
 	}

@@ -11,8 +11,6 @@ public static class Cast
 	#region Seq
 	public static object CastSeq(this string value, string name)
 	{
-		// register enum class
-
 		if (!name.TryParseToEnum<SeqType>(out var SeqType)) return null;
 		else if (SeqType == SeqType.KeyCap) return KeyCap.Cast(KeyCap.GetKeyCode(value));
 		else if (SeqType == SeqType.KeyCommand) return KeyCommand.Cast(value.ToEnum<KeyCommandSeq>());
@@ -36,17 +34,10 @@ public static class Cast
 
 	public static BaseRecord CastObject(this string DataInfo)
 	{
-		if (string.IsNullOrWhiteSpace(DataInfo)) return default;
-		if (DataInfo.Contains(':'))
-		{
-			var tmp = DataInfo.Split(':');
+		if (string.IsNullOrWhiteSpace(DataInfo) || !DataInfo.Contains(':')) return default;
 
-			var obj = CastObject<BaseRecord>(tmp[1]?.Trim(), tmp[0]?.Trim());
-			if (obj != null) return obj;
-		}
-
-		Debug.WriteLine($"Cast Failed: {DataInfo}");
-		return default;
+		var tmp = DataInfo.Split(':');
+		return CastObject<BaseRecord>(tmp[1]?.Trim(), tmp[0]?.Trim());
 	}
 
 	public static T CastObject<T>(this string DataKey, string TableName = null) where T : BaseRecord

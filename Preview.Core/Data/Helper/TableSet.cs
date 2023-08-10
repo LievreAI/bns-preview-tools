@@ -188,22 +188,23 @@ public class TableSet : IDisposable
 	{
 		if (Tables is not null) return;
 
-		var _provider = DefaultProvider.Load(Folder ?? CommonPath.GameFolder);
-		this.Provider = _provider;
-		if (!UseDB) return;
+		this.Provider ??= DefaultProvider.Load(Folder ?? CommonPath.GameFolder);
 
 
-		var data = _provider.XmlData.ExtractBin();
-		var local = _provider.LocalData.ExtractBin();
+		if(UseDB && this.Provider is DefaultProvider provider)
+		{
+			var data = provider.XmlData.ExtractBin();
+			var local = provider.LocalData.ExtractBin();
 
-		this.Tables = data.Tables.Concat(local.Tables).ToArray();
-		this.CreatedAt = data.CreatedAt;
+			this.Tables = data.Tables.Concat(local.Tables).ToArray();
+			this.CreatedAt = data.CreatedAt;
 
-		detect.Detect(this.Tables, data.NameTable.CreateTable());
-		this.LoadConverter();
+			detect.Detect(this.Tables, data.NameTable.CreateTable());
+			this.LoadConverter();
 
-		if (Settings.TestMode == DumpMode.Full)
-			Parallel.ForEach(this.Tables, table => converter.ProcessTable(table, null, CommonPath.DataFiles));
+			if (Settings.TestMode == DumpMode.Full)
+				Parallel.ForEach(this.Tables, table => converter.ProcessTable(table, null, CommonPath.DataFiles));
+		}
 	}
 	#endregion
 

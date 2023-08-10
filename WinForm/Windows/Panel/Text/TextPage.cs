@@ -94,7 +94,7 @@ public partial class TextPage : UserControl
 		{
 			using var set = new LocalDataTableSet(Source);
 			var table = set.Text;
-			table.TryLoad();
+			table.Load();
 
 			switch (Path.GetExtension(OutPath))
 			{

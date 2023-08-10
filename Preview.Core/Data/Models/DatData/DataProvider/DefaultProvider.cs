@@ -1,20 +1,31 @@
-﻿using Xylia.Preview.Data.Models.DatData.DatDetect;
+﻿using System.Xml;
+
+using Xylia.Preview.Data.Models.DatData.DatDetect;
 
 namespace Xylia.Preview.Data.Models.DatData.DataProvider;
 public class DefaultProvider : IDataProvider
 {
 	#region Fields
-	public Locale Locale;
 	public BNSDat XmlData;
 	public BNSDat LocalData;
 	public BNSDat ConfigData;
 	public bool is64Bit = true;
 
 	public static Lazy<IDatSelect> select;
+
+	public Locale Locale { get; private set; }
 	#endregion
 
 
 	#region Methods
+	bool IDataProvider.is64Bit() => this.is64Bit;
+
+	IEnumerable<XmlDocument> IDataProvider.GetFiles(string pattern, string type)
+	{
+		return this.XmlData.EnumerateFiles(pattern).Select(o => o.Xml.Nodes);
+	}
+
+
 	public static DefaultProvider Load(string FolderPath, ResultMode mode = ResultMode.SelectDat)
 	{
 		if (string.IsNullOrWhiteSpace(FolderPath) || !Directory.Exists(FolderPath))
@@ -43,11 +54,6 @@ public class DefaultProvider : IDataProvider
 		provider.Locale = new Locale(new DirectoryInfo(FolderPath));
 		return provider;
 	}
-
-
-	FileInfo[] IDataProvider.GetFiles(string pattern) => throw new NotImplementedException();
-
-	bool IDataProvider.is64Bit() => this.is64Bit;
 	#endregion
 }
 

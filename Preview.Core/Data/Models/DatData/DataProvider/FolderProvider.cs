@@ -1,4 +1,8 @@
-﻿namespace Xylia.Preview.Data.Models.DatData.DataProvider;
+﻿using System.Xml;
+
+using Xylia.Xml;
+
+namespace Xylia.Preview.Data.Models.DatData.DataProvider;
 public class FolderProvider : IDataProvider
 {
 	#region Constructor
@@ -8,5 +12,8 @@ public class FolderProvider : IDataProvider
 	#endregion
 
 
-	FileInfo[] IDataProvider.GetFiles(string pattern) => directory.GetFiles(pattern, SearchOption.AllDirectories);
+	public FileInfo[] GetFiles(string pattern) => directory.GetFiles(pattern, SearchOption.AllDirectories);
+
+	public IEnumerable<XmlDocument> GetFiles(string pattern, string type) => 
+		GetFiles(pattern).Select(o => o.FullName.GetXmlDocument());
 }

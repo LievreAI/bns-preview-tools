@@ -4,7 +4,6 @@ namespace Xylia.Preview.Data.Record;
 [AliasRecord]
 public sealed class ItemEvent : BaseRecord
 {
-	[Signal("event-expiration-time")]
 	public DateTime EventExpirationTime;
 
 	public Text Name2;

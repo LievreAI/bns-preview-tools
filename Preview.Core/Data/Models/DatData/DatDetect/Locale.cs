@@ -10,11 +10,9 @@ namespace Xylia.Preview.Data.Models.DatData.DatDetect;
 public sealed class Locale
 {
 	private string _publisher;
-
 	public string _language;
-
 	public string Universe;
-
+	public string ProductVersion;
 
 	public Language Language => _language.ToEnum<Language>();
 	public Publisher Publisher => _publisher.ToEnum<Publisher>();
@@ -38,15 +36,21 @@ public sealed class Locale
 	private void Load(DirectoryInfo directory)
 	{
 		#region mode
-		var local = directory.GetDirectories("Win64", SearchOption.AllDirectories).FirstOrDefault()?
-			.GetFiles("local.ini").FirstOrDefault();
-		if (local is not null)
+		var Win64 = directory.GetDirectories("Win64", SearchOption.AllDirectories).FirstOrDefault();
+		if (Win64 is not null)
 		{
-			_publisher = Ini.ReadValue("Locale", "Publisher", local.FullName);
-			_language = Ini.ReadValue("Locale", "Language", local.FullName);
-			Universe = Ini.ReadValue("Locale", "Universe", local.FullName);
+			var version = Win64?.GetFiles("version.ini").FirstOrDefault();
+			if (version is not null) ProductVersion = Ini.ReadValue("Version", "ProductVersion", version.FullName);
 
-			return;
+			var local = Win64?.GetFiles("local.ini").FirstOrDefault();
+			if (local is not null)
+			{
+				_publisher = Ini.ReadValue("Locale", "Publisher", local.FullName);
+				_language = Ini.ReadValue("Locale", "Language", local.FullName);
+				Universe = Ini.ReadValue("Locale", "Universe", local.FullName);
+
+				return;
+			}
 		}
 		#endregion
 

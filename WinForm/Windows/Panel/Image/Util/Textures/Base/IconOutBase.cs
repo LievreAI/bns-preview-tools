@@ -50,7 +50,7 @@ public abstract class IconOutBase : IDisposable
 
 		#region analyse
 		action?.Invoke("正在分析图标数据...");
-		set.IconTexture.TryLoad();
+		set.IconTexture.Load();
 
 		action?.Invoke("正在分析物品数据...");
 		this.QuoteInfos = new();

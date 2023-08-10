@@ -81,18 +81,14 @@ public abstract partial class Case : BaseRecord
 
 
 
-
 	// 旧版本物品消耗
 	[Obsolete]
-	[Signal("grocery")]
 	public string Grocery;
 
-	[Obsolete]
-	[Signal("grocery-count")]
+	[Signal("grocery-count") , Obsolete]
 	public short GroceryCount = 1;
 
-	[Obsolete]
-	[Signal("remove-grocery")]
+	[Signal("remove-grocery") , Obsolete]
 	public bool RemoveGrocery;
 
 	// 新版本物品消耗
@@ -102,29 +98,11 @@ public abstract partial class Case : BaseRecord
 	[Signal("required-item-depot")]
 	public DepotType RequiredItemDepot;
 
-	[Signal("required-item-1")]
-	public Item RequiredItem1;
+	[Signal("required-item") , Repeat(4)]
+	public Item[] RequiredItem;
 
-	[Signal("required-item-2")]
-	public Item RequiredItem2;
-
-	[Signal("required-item-3")]
-	public Item RequiredItem3;
-
-	[Signal("required-item-4")]
-	public Item RequiredItem4;
-
-	[Signal("required-item-count-1")]
-	public short RequiredItemCount1;
-
-	[Signal("required-item-count-2")]
-	public short RequiredItemCount2;
-
-	[Signal("required-item-count-3")]
-	public short RequiredItemCount3;
-
-	[Signal("required-item-count-4")]
-	public short RequiredItemCount4;
+	[Signal("required-item-count"), Repeat(4)]
+	public short[] RequiredItemCount;
 
 	[Signal("required-item-loss")]
 	public bool RequiredItemLoss;

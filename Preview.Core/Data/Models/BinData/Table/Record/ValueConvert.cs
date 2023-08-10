@@ -25,7 +25,6 @@ public static class ValueConvert
 			if (value.TryParseToEnum(type, out var seq, Extension: true)) return seq;
 			throw new FormatException($"Seq `{type.Name}` cast failed: {value}");
 		}
-		else if (type == typeof(DateTime)) return DateTime.Parse(value);
 		else if (type == typeof(BaseRecord)) return value.CastObject();		/// use base class mean as <see cref="AttributeType.TTRef">
 		else if (typeof(BaseRecord).IsAssignableFrom(type))      /// use sub class mean as <see cref="AttributeType.TRef">
 		{
@@ -63,6 +62,8 @@ public static class ValueConvert
 																			/// <see cref="AttributeType.TAngle">
 		else if (type == typeof(Msec)) return new Msec(int.Parse(value));   /// <see cref="AttributeType.TMsec">
 		else if (type == typeof(Script_obj)) return new Script_obj(value);  /// <see cref="AttributeType.TScript_obj">
+		else if (type == typeof(DateTime)) return DateTime.Parse(value);    /// <see cref="AttributeType.TXUnknown1">
+		else if (type == typeof(Time64)) return Time64.Parse(value);
 		else if (type == typeof(FPath)) return new FPath(value);            /// <see cref="AttributeType.TXUnknown2">
 
 

@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFramework>net7.0-windows</TargetFramework>
-
 		<Authors>Xylia</Authors>
 		<AssemblyVersion>1.0.4.*</AssemblyVersion>
 		<FileVersion>1.0.4.0</FileVersion>
@@ -62,6 +61,9 @@
 	<ItemGroup>
 		<EmbeddedResource Include="Data\Records\TableDef-Global\*" />
 		<EmbeddedResource Include="Data\Records\TableDef\*" />
+	</ItemGroup>
+	<ItemGroup>
+	  <None Remove="Data\Records\TableDef\PartyBattleFieldZoneTimeEffect.xml" />
 	</ItemGroup>
 	<ItemGroup>
 		<Compile Update="Data\Helper\Output\OutBase.zh-Hans.Designer.cs">

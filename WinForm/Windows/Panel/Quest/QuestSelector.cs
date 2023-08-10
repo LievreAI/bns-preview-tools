@@ -75,7 +75,7 @@ public partial class QuestSelector : Form
 
 	public void LoadData()
 	{
-		FileCache.Data.Text.TryLoad();
+		FileCache.Data.Text.Load();
 
 		this.RefreshList();
 	}

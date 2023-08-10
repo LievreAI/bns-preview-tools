@@ -9,7 +9,6 @@ using Xylia.Preview.Data.Models.DatData;
 using Xylia.Preview.Data.Models.DatData.DataProvider;
 using Xylia.Preview.Data.Models.Definition;
 using Xylia.Preview.Data.Record;
-using Xylia.Preview.Data.Record.Test;
 using Xylia.Preview.Properties;
 
 
@@ -39,15 +38,17 @@ public class TableTests
 		}
 	}
 
-	//[TestMethod]
+	[TestMethod]
 	[DataRow(1931)]
 	public void QuestTest(int id)
 	{
+		FileCache.Data.Provider = new FolderProvider(@"D:\资源\客户端相关\Auto\data");
+
 		var table = FileCache.Data.Quest;
 		var record = table[id];
 
 		Console.WriteLine(record);
-		//Console.WriteLine(record.XmlInfo());
+		//Console.WriteLine(record.Serialize());
 	}
 
 
@@ -55,8 +56,8 @@ public class TableTests
 	[TestMethod]
 	public void Test2()
 	{
-		var table =  ClientConfiguration.LoadFrom();
-		table.Test();
+		//var table =  ClientConfiguration.LoadFrom();
+		//table.Test();
 
 
 
@@ -111,8 +112,6 @@ public sealed class TestSet : TableSet
 			this.detect.Detect(this.Tables, AliasTable);
 		}
 	}
-
-
 
 	/// <summary>
 	/// from external files

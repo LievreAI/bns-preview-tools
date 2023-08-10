@@ -1,4 +1,6 @@
-﻿namespace Xylia.Preview.Data.Models.DatData.DataProvider;
+﻿using Xylia.Preview.Data.Models.DatData.DatDetect;
+
+namespace Xylia.Preview.Data.Models.DatData.DataProvider;
 public class FileProvider : IDataProvider
 {
 	#region Constructor

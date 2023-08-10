@@ -32,7 +32,7 @@ public static class CreateClass
 
 			foreach (var attribute in sub.Attributes) InstanceAttribute(attribute, result, true);
 
-			result.Remove(result.Length - 2, 1);
+			result.Remove(result.Length - 1, 1);
 			result.AppendLine("}\n");
 		}
 
@@ -57,6 +57,7 @@ public static class CreateClass
 			AttributeType.TXUnknown1 or AttributeType.TTime64 => "DateTime",
 			AttributeType.TXUnknown2 => "FPath",
 			AttributeType.TRef => attribute is AttributeDef attrDef ? attrDef.ReferedTableName?.TitleCase() : $"ref_{attribute.ReferedTable}",
+			AttributeType.TTRef => "BaseRecord",
 			AttributeType.TSeq or AttributeType.TSeq16 or AttributeType.TProp_seq or AttributeType.TProp_field
 				=> attribute.SequenceDef?.Name?.TitleCase() ?? attribute.Name.TitleCase() + "Seq",
 
@@ -74,11 +75,10 @@ public static class CreateClass
 			sys_attr.Add($"Repeat({attribute.Repeat})");
 		}
 
-
 		if (sys_attr.Any()) result.AppendLine($"{prefix}[{sys_attr.Aggregate(", ")}]");
 		#endregion
 
 
-		result.Append($"{prefix}public {TypeInfo} {attribute.Name.TitleCase()};\n\n");
+		result.Append($"{prefix}public {TypeInfo} {attribute.Name.TitleCase()};\n");
 	}
 }

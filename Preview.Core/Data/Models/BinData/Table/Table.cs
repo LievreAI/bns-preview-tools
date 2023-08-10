@@ -24,7 +24,7 @@ using TableModel = BnsBinTool.Core.Models.Table;
 
 
 namespace Xylia.Preview.Data.Models.BinData.Table;
-public class Table<T> : IEnumerable<T>, ITable where T : BaseRecord, new()
+public sealed class Table<T> : IEnumerable<T>, ITable where T : BaseRecord, new()
 {
 	#region Constructor
 	public string Name { get; set; }
@@ -48,10 +48,6 @@ public class Table<T> : IEnumerable<T>, ITable where T : BaseRecord, new()
 			this.ByAlias[Alias] = Ref;
 	}
 
-
-	protected readonly Dictionary<short, Type> SubType = new();
-
-
 	private Lazy<T>[] _data;
 
 	public Lazy<T>[] Data
@@ -65,13 +61,41 @@ public class Table<T> : IEnumerable<T>, ITable where T : BaseRecord, new()
 	}
 	#endregion
 
+	#region Type
+	readonly Dictionary<short, Type> Types = new();
+	readonly Dictionary<string, short> Types_Name = new(StringComparer.OrdinalIgnoreCase);
+
+	private void GetSubType()
+	{
+		short typeIndex = -1;
+		foreach (var instance in Assembly.GetExecutingAssembly().GetTypes())
+		{
+			if (!instance.IsAbstract && typeof(T).IsAssignableFrom(instance) && instance != typeof(T))
+			{
+				typeIndex++;
+
+				Types[typeIndex] = instance;
+				Types_Name[instance.Name.TitleLowerCase()] = typeIndex;
+			}
+		}
+	}
+
+	private T CreateInstance(string Type, out short? type) => CreateInstance(type = string.IsNullOrWhiteSpace(Type) ? null : Types_Name.GetValueOrDefault(Type));
+
+	private T CreateInstance(short? type)
+	{
+		if (type.HasValue && Types.TryGetValue(type.Value, out var instance))
+			return Activator.CreateInstance(instance) as T;
+		return Activator.CreateInstance(typeof(T)) as T;
+	}
+	#endregion
+
+
 
 	#region Load Methods
 	private bool InLoading = false;
 
-	public void TryLoad() => this.Load();
-
-	private void Load(bool Reload = false)
+	public void Load()
 	{
 		#region Initialize
 		if (this.InLoading)
@@ -80,7 +104,7 @@ public class Table<T> : IEnumerable<T>, ITable where T : BaseRecord, new()
 			return;
 		}
 
-		if (this._data != null && !Reload) return;
+		if (this._data != null) return;
 		if (Program.IsDesignMode) return;
 
 
@@ -90,16 +114,7 @@ public class Table<T> : IEnumerable<T>, ITable where T : BaseRecord, new()
 
 
 		ArgumentNullException.ThrowIfNull(TableDef);
-
-		short typeIndex = 0;
-		foreach (var itemType in Assembly.GetExecutingAssembly().GetTypes())
-		{
-			if (!itemType.IsAbstract && typeof(T).IsAssignableFrom(itemType) && itemType != typeof(T))
-			{
-				SubType[typeIndex++] = itemType;
-			}
-		}
-
+		this.GetSubType();
 
 		lock (this)
 		{
@@ -173,9 +188,9 @@ public class Table<T> : IEnumerable<T>, ITable where T : BaseRecord, new()
 
 			this.ByRef[Ref] = this._data[x] = new(() =>
 			{
-				var Object = new T();
+				var Object = CreateInstance(element.Attributes["type"]?.Value, out var type);
 				Object.Ref = Ref;
-				//Object.Type = ;
+				Object.Type = type ?? -1;
 				Object.LoadData(element);
 
 				return Object;
@@ -187,57 +202,43 @@ public class Table<T> : IEnumerable<T>, ITable where T : BaseRecord, new()
 	{
 		lock (Owner) Owner.LoadData(XmlDataPath is null);
 
-
-		if (XmlDataPath is null)
+		if (XmlDataPath is not null)
 		{
-			//get table
-			if (this.TableDef.Type == 0) throw new FileNotFoundException();
-
-			var table = Owner.Tables.FirstOrDefault(table => table.Type == this.TableDef.Type);
-			TableDefinitionEx.CheckVersion(TableDef, table);
-			TableDefinitionEx.CheckSize(TableDef, table, (msg) => Debug.WriteLine(msg));
-
-
-#pragma warning disable IDE0150
-			if (Settings.TestMode == DumpMode.Used && this.Owner is TableSet)
-				ProcessTable(CommonPath.DataFiles);
-#pragma warning restore IDE0150
-
-
-			var aliasAttrDef = TableDef["alias"];
-
-			this._data = new Lazy<T>[table.Records.Count];
-			for (var x = 0; x < this._data.Length; x++)
-			{
-				var record = table.Records[x];
-				if (record is null) continue;
-
-				var _ref = record.RecordRef;
-				if (aliasAttrDef != null) AddAlias(record.StringLookup.GetString(record.Get<int>(aliasAttrDef.Offset)), _ref);
-
-
-				this.ByRef[_ref] = this._data[x] = new(() =>
-				{
-					T GetSubType()
-					{
-						if (SubType.TryGetValue(record.SubclassType, out var type))
-							return (T)Activator.CreateInstance(type);
-
-						return new T();
-					}
-
-
-					var Object = GetSubType();
-
-					Object.Ref = _ref;
-					Object.Type = record.SubclassType;
-					Object.LoadData(new DbData(Owner.converter, this.TableDef, record));
-
-					return Object;
-				});
-			}
+			LoadXml(Owner.Provider.GetFiles(XmlDataPath, "Xml"));
+			return;
 		}
-		else LoadXml((Owner.Provider as DefaultProvider).XmlData.EnumerateFiles(XmlDataPath).Select(o => o.Xml.Nodes));
+
+		//get table
+		if (this.TableDef.Type == 0) throw new FileNotFoundException();
+		var table = Owner.Tables.FirstOrDefault(table => table.Type == this.TableDef.Type);
+		TableDefinitionEx.CheckVersion(TableDef, table);
+		TableDefinitionEx.CheckSize(TableDef, table, (msg) => Debug.WriteLine(msg));
+
+		if (Settings.TestMode == DumpMode.Used && this.Owner?.GetType() == typeof(TableSet))
+			ProcessTable(CommonPath.DataFiles);
+
+
+		var aliasAttrDef = TableDef["alias"];
+
+		this._data = new Lazy<T>[table.Records.Count];
+		for (var x = 0; x < this._data.Length; x++)
+		{
+			var record = table.Records[x];
+			//if (record is null) continue;
+
+			if (aliasAttrDef != null) AddAlias(record.StringLookup.GetString(record.Get<int>(aliasAttrDef.Offset)), record.RecordRef);
+
+
+			this.ByRef[record.RecordRef] = this._data[x] = new(() =>
+			{
+				var Object = CreateInstance(record.SubclassType);
+				Object.Ref = record.RecordRef;
+				Object.Type = record.SubclassType;
+				Object.LoadData(new DbData(Owner.converter, this.TableDef, record));
+
+				return Object;
+			});
+		}
 	}
 	#endregion
 
@@ -249,9 +250,9 @@ public class Table<T> : IEnumerable<T>, ITable where T : BaseRecord, new()
 	public T this[BaseRecord resolvedRecord] => this[resolvedRecord?.alias];
 
 
-	protected Lazy<T> GetLazyInfo(string Alias)
+	private Lazy<T> GetLazyInfo(string Alias)
 	{
-		this.TryLoad();
+		this.Load();
 
 		if (string.IsNullOrWhiteSpace(Alias)) return null;
 		else if (this.ByAlias.TryGetValue(Alias, out var item)) return GetLazyInfo(item);
@@ -269,9 +270,9 @@ public class Table<T> : IEnumerable<T>, ITable where T : BaseRecord, new()
 		return null;
 	}
 
-	protected Lazy<T> GetLazyInfo(Ref Ref)
+	private Lazy<T> GetLazyInfo(Ref Ref)
 	{
-		this.TryLoad();
+		this.Load();
 
 		if (Ref.Id <= 0) return null;
 		else if (this.ByRef.TryGetValue(Ref, out var item)) return item;
@@ -361,7 +362,6 @@ public class Table<T> : IEnumerable<T>, ITable where T : BaseRecord, new()
 	IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 	#endregion
 }
-
 
 public interface ITable : IEnumerable
 {

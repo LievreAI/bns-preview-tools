@@ -3,47 +3,42 @@ using Xylia.Preview.Common.Interface;
 
 namespace Xylia.Preview.Data.Record;
 [AliasRecord]
-public sealed class FieldZone : BaseRecord, IAttraction
+public class FieldZone : BaseRecord, IAttraction
 {
+	public short Id;
+
+	public string Alias;
+
+	[Repeat(30)]
+	public Zone[] Zone;
+
 	public AttractionGroup Group;
 
-	[Signal("attraction-quest-1")]
-	public string AttractionQuest1;
+	[Repeat(5)]
+	public Quest[] AttractionQuest;
 
-	[Signal("attraction-quest-2")]
-	public string AttractionQuest2;
-
-	[Signal("attraction-quest-3")]
-	public string AttractionQuest3;
-
-	[Signal("attraction-quest-4")]
-	public string AttractionQuest4;
-
-	[Signal("attraction-quest-5")]
-	public string AttractionQuest5;
-
-	[Signal("ui-filter-attraction-quest-only")]
 	public bool UiFilterAttractionQuestOnly;
 
-	[Signal("respawn-confirm-text")]
 	public Text RespawnConfirmText;
 
 	public Text Name2;
 
 	public Text Desc;
 
-	[Signal("ui-text-grade")]
 	public sbyte UiTextGrade;
 
-	[Signal("reward-summary")]
 	public AttractionRewardSummary RewardSummary;
 
+	public sealed class Normal : FieldZone
+	{
+	}
 
-	[Signal("guild-battle-field-zone")]
-	public string GuildBattleFieldZone;
+	public sealed class GuildBattleFieldEntrance : FieldZone
+	{
+		public GuildBattleFieldZone GuildBattleFieldZone;
 
-	[Signal("min-fixed-channel")]
-	public int MinFixedChannel;
+		public sbyte MinFixedChannel;
+	}
 
 
 	#region Interface

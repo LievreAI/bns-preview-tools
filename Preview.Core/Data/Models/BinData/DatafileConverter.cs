@@ -8,6 +8,7 @@ using BnsBinTool.Core.Definitions;
 using BnsBinTool.Core.Helpers;
 
 using Xylia.Extension;
+using Xylia.Preview.Common.Struct;
 using Xylia.Preview.Data.Models.BinData.Table;
 
 using RecordModel = BnsBinTool.Core.Models.Record;
@@ -362,12 +363,7 @@ public class DatafileConverter
 				var l = record.Get<long>(attribute.Offset);
 				if (l == 0) return null;
 
-				// get time zone
-				//if (l > 0) l += 3600;
-				value = l.GetDateTime().ToString();
-
-				//new DateTime(tick, DateTimeKind.Local, isAmbiguousLocalDst);
-
+				value = new Time64(l).LocalTime.ToString();
 				break;
 			}
 
@@ -382,8 +378,6 @@ public class DatafileConverter
 	}
 
 
-
-
 	private string ToRef(int table, Ref Ref)
 	{
 		if (!_tablesAliases.ByRef.TryGetValue(table, out var tableAliases) ||
@@ -393,9 +387,4 @@ public class DatafileConverter
 
 		return value;
 	}
-
-	//public DateTime ToLocalTime(DateTime time)
-	//{
-
-	//}
 }

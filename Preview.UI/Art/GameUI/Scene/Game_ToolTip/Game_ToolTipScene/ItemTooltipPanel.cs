@@ -612,7 +612,7 @@ public partial class ItemTooltipPanel : Form
 		if (LimitInfo.Any())
 		{
 			var comma = "Name.Item.Cannot.Comma".GetText();
-			this.LoadBottomControl((FileCache.Data.Provider as DefaultProvider)?.Locale?.Language switch
+			this.LoadBottomControl(FileCache.Data.Provider?.Locale?.Language switch
 			{
 				Language.Korean => LimitInfo.Aggregate(comma, now => (now).GetText()) + " " + "Name.Item.Cannot".GetText(),
 				Language.ChineseS => LimitInfo.Aggregate(comma, now => (now + ".Tencent").GetText()),
