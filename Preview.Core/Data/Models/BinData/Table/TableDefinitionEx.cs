@@ -158,8 +158,8 @@ public static class TableDefinitionEx
 			(TableDefinition)els.ElementAtOrDefault(documentElement.Children.FirstOrDefault()) ?? 
 			new TableDefinition { IsEmpty = true };
 		table.Type = Type ?? 0;
+		table.OriginalName = table.Name ?? TypeName;
 		table.Name = TypeName;
-		table.OriginalName = TypeName;
 		table.MajorVersion = major;
 		table.MinorVersion = minor;
 		table.AutoKey = (tableNode.Attributes["autokey"]?.Value).ToBool();
@@ -187,6 +187,8 @@ public static class TableDefinitionEx
 
 			table.Attributes.Insert(0, autoIdAttr);
 			table.ExpandedAttributes.Insert(0, autoIdAttr);
+			table._attributesDictionary[autoIdAttr.Name] = autoIdAttr;
+			table._expandedAttributesDictionary[autoIdAttr.Name] = autoIdAttr;
 		}
 
 		return table;

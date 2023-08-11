@@ -38,17 +38,27 @@ public class TableTests
 		}
 	}
 
+
 	[TestMethod]
-	[DataRow(1931)]
+	[DataRow(1)]
 	public void QuestTest(int id)
 	{
-		FileCache.Data.Provider = new FolderProvider(@"D:\资源\客户端相关\Auto\data");
+		//FileCache.Data.Provider = new FolderProvider(@"D:\资源\客户端相关\Auto\data");
 
-		var table = FileCache.Data.Quest;
-		var record = table[id];
+		var _table = FileCache.Data.AttractionGroup;
+		var _record = _table[id];
 
-		Console.WriteLine(record);
-		//Console.WriteLine(record.Serialize());
+
+		// create alias map
+		//var resolved = _table.Owner.converter._tablesAliases;
+		//DatafileAliasResolverHelper.Resolve(resolved, FileCache.Data.AttractionGroup);
+
+		// debug
+		//Console.WriteLine(_record);
+		//Console.WriteLine(_record.Serialize().Data.ToHex(true));
+
+		var table = _table.Serialize();
+		Trace.WriteLine(BitConverter.ToString(table.ToArray(true)));
 	}
 
 
@@ -109,7 +119,7 @@ public sealed class TestSet : TableSet
 		if (true)
 		{
 			var AliasTable = data.NameTable.CreateTable();
-			this.detect.Detect(this.Tables, AliasTable);
+			this.detect.Load(this.Tables, AliasTable);
 		}
 	}
 

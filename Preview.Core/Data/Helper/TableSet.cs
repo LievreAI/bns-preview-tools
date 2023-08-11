@@ -1,4 +1,5 @@
-﻿using BnsBinTool.Core.Definitions;
+﻿using BnsBinTool.Core.DataStructs;
+using BnsBinTool.Core.Definitions;
 
 using Xylia.Extension.Class;
 using Xylia.Preview.Data.Models.BinData;
@@ -134,6 +135,20 @@ public class TableSet : IDisposable
 	#endregion
 
 
+	//public ITable this[short type]
+	//{
+	//	get
+	//	{
+	//		var tableDef = tableDefinitions.ToDictionary(def => def.Name.Replace("-", null).ToLower());
+
+	//		return new Table<BaseRecord>
+	//		{
+
+	//		};
+	//	}
+	//}
+
+
 	#region Constructor
 	public TableSet(bool unload = false)
 	{
@@ -189,9 +204,7 @@ public class TableSet : IDisposable
 		if (Tables is not null) return;
 
 		this.Provider ??= DefaultProvider.Load(Folder ?? CommonPath.GameFolder);
-
-
-		if(UseDB && this.Provider is DefaultProvider provider)
+		if (UseDB && this.Provider is DefaultProvider provider)
 		{
 			var data = provider.XmlData.ExtractBin();
 			var local = provider.LocalData.ExtractBin();
@@ -199,11 +212,28 @@ public class TableSet : IDisposable
 			this.Tables = data.Tables.Concat(local.Tables).ToArray();
 			this.CreatedAt = data.CreatedAt;
 
-			detect.Detect(this.Tables, data.NameTable.CreateTable());
+			detect.Load(this.Tables, data.NameTable.CreateTable());
 			this.LoadConverter();
 
 			if (Settings.TestMode == DumpMode.Full)
 				Parallel.ForEach(this.Tables, table => converter.ProcessTable(table, null, CommonPath.DataFiles));
+		}
+	}
+
+
+	public void Test()
+	{
+		// create temp map
+		detect.Load(tableDefinitions);
+		this.LoadConverter();
+
+		foreach (var table in tableDefinitions)
+		{
+			var byRef = new Dictionary<Ref, string>();
+			var byAlias = new Dictionary<string, Ref>();
+
+			_converter._tablesAliases.ByRef[table.Type] = byRef;
+			_converter._tablesAliases.ByAlias[table.Type] = byAlias;
 		}
 	}
 	#endregion
@@ -221,7 +251,6 @@ public class TableSet : IDisposable
 }
 
 
-
 public sealed class LocalDataTableSet : TableSet
 {
 	private readonly string datpath;
@@ -236,7 +265,7 @@ public sealed class LocalDataTableSet : TableSet
 		var local = new BNSDat(datpath).ExtractBin();
 
 		this.Tables = local.Tables.ToArray();
-		detect.Detect(this.Tables, null);
+		detect.Load(this.Tables, null);
 
 		this.LoadConverter();
 	}

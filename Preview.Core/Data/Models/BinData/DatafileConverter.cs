@@ -19,7 +19,7 @@ public class DatafileConverter
 {
 	private readonly DatafileDefinition _datafileDef;
 
-	private readonly ResolvedAliases _tablesAliases;
+	public readonly ResolvedAliases _tablesAliases;
 
 	public readonly RecordBuilder Builder;
 
@@ -376,7 +376,6 @@ public class DatafileConverter
 
 		return value;
 	}
-
 
 	private string ToRef(int table, Ref Ref)
 	{

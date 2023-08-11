@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Text;
 
 using BnsBinTool.Core.Models;
 
@@ -6,7 +7,6 @@ using Newtonsoft.Json;
 
 using Xylia.Extension;
 using Xylia.Preview.Data.Models.BinData;
-using Xylia.Preview.Data.Models.BinData.Table;
 
 namespace Xylia.Preview.Tests.DatTool.Utils.Extract;
 
@@ -168,11 +168,11 @@ public static partial class DumpEx
 
 	private static DataTable DumpLookup(DataTable ParentTable, DataRow ParentRow, StringLookup Lookups)
 	{
-		var words = new StringList(Lookups);
+		var strings = Encoding.Unicode.GetString(Lookups.Data).Split('\0', StringSplitOptions.RemoveEmptyEntries);
 
 		#region 创建结构
 		if (!ParentTable.Columns.Contains("LookupCount")) ParentTable.Columns.Add("LookupCount", typeof(int));
-		ParentRow["LookupCount"] = words.Count;
+		ParentRow["LookupCount"] = strings.Length;
 
 
 		if (!ParentTable.Columns.Contains("Lookup")) ParentTable.Columns.Add("Lookup", typeof(DataTable));
@@ -184,9 +184,9 @@ public static partial class DumpEx
 
 		#region 实例化对象并赋值
 		long tmpIndex = 0;
-		for (int i = 0; i < words.Count; i++)
+		for (int i = 0; i < strings.Length; i++)
 		{
-			string w = words[i];
+			string w = strings[i];
 			if (w != null && w.Length > 0)
 			{
 				DataRow LookupDataRow = LookupData.NewRow();

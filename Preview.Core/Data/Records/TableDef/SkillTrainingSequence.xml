@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <table name="skill-training-sequence" version="0.5" autokey="true" module="4">
   <el name="table" child="1" />
-  <el name="skill-training-sequence">
+  <el name="skill-training-sequence" child="2" >
     <attribute name="alias" type="String" required="y" max="50" />
     <attribute name="repeat-count" type="Int8" default="1" />
   </el>

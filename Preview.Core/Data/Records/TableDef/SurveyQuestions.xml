@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <table name="surveyquestions" version="0.1" autokey="true" module="4">
   <el name="table" child="1" />
-  <el name="surveyquestion">
+  <el name="surveyquestion" child="2,3" >
     <attribute name="alias" type="String" required="y" max="70" />
     <attribute name="title" type="String" max="256" />
     <attribute name="greeting" type="String" max="256" />

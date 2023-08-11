@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <table name="summoned-sequence" version="0.5" autokey="true" module="2052">
   <el name="table" child="1" />
-  <el name="summoned-sequence">
+  <el name="summoned-sequence" child="3,4,5" >
     <attribute name="alias" type="String" required="y" max="70" />
   </el>
   <el name="action">
@@ -15,13 +15,13 @@
     </sub>
     <sub name="select" />
   </el>
-  <el name="melee">
+  <el name="melee" child="2" >
     <attribute name="margin" type="Distance" default="40" />
   </el>
-  <el name="range">
+  <el name="range" child="2" >
     <attribute name="margin" type="Distance" default="160" />
   </el>
-  <el name="range-sim">
+  <el name="range-sim" child="2" >
     <attribute name="margin" type="Distance" default="160" />
   </el>
 </table>

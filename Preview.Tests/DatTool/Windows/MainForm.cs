@@ -380,7 +380,7 @@ public partial class MainForm : Form
 
 				var data = provider.XmlData.ExtractBin();
 				var detect = new DatafileDetect();
-				detect.Detect(data);
+				detect.Load(data);
 
 				data.Tables.Dump(detect, folder, new ExportOption()
 				{

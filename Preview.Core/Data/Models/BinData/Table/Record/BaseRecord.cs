@@ -225,14 +225,21 @@ public class BaseRecord
 			XmlNodeType = 1,
 			SubclassType = def.SubclassType,
 			DataSize = def.Size,
-			StringLookup = _recordBuilder.StringLookup
+			StringLookup = _recordBuilder.StringLookup, 
 		};
 
 		// Go through each attribute
 		//AttributeDefaultValues.SetRecordDefaults(record, this);
 		foreach (var attr in table.TableDef.ExpandedAttributes)
 		{
-			_recordBuilder.SetAttribute(record, attr, Attributes[attr.Name]);
+			try
+			{
+				_recordBuilder.SetAttribute(record, attr, Attributes[attr.Name]);
+			}
+			catch
+			{
+				
+			}
 		}
 
 		_recordBuilder.FinalizeRecord();

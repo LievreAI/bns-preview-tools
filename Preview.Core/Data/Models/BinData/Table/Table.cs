@@ -38,25 +38,25 @@ public sealed class Table<T> : IEnumerable<T>, ITable where T : BaseRecord, new(
 	#endregion
 
 	#region Data
-	protected readonly Dictionary<Ref, Lazy<T>> ByRef = new();
+	private readonly Dictionary<Ref, Lazy<T>> ByRef = new();
 
-	protected readonly Dictionary<string, Ref> ByAlias = new(StringComparer.OrdinalIgnoreCase);
+	private readonly Dictionary<string, Ref> ByAlias = new(StringComparer.OrdinalIgnoreCase);
 
-	protected void AddAlias(string Alias, Ref Ref)
+	private void AddAlias(string Alias, Ref Ref)
 	{
 		if (Alias is not null && !this.ByAlias.ContainsKey(Alias))
 			this.ByAlias[Alias] = Ref;
 	}
 
-	private Lazy<T>[] _data;
+	private Lazy<T>[] _records;
 
-	public Lazy<T>[] Data
+	public Lazy<T>[] Records
 	{
-		private set => this._data = value;
+		private set => this._records = value;
 		get
 		{
 			this.Load();
-			return this._data;
+			return this._records;
 		}
 	}
 	#endregion
@@ -104,12 +104,12 @@ public sealed class Table<T> : IEnumerable<T>, ITable where T : BaseRecord, new(
 			return;
 		}
 
-		if (this._data != null) return;
+		if (this._records != null) return;
 		if (Program.IsDesignMode) return;
 
 
 		this.InLoading = true;
-		this._data = null;
+		this._records = null;
 		#endregion
 
 
@@ -122,17 +122,17 @@ public sealed class Table<T> : IEnumerable<T>, ITable where T : BaseRecord, new(
 			{
 				try
 				{
-					if (DataProvider is null && !Program.IsDebugMode) this.LoadData();
+					if (DataProvider is null && Owner.Provider is DefaultProvider or null) this.LoadData();
 					else this.LoadXml();
 
-					Trace.WriteLine($"[{DateTime.Now}] load table `{Name}` successful ({this._data.Length})");
+					Trace.WriteLine($"[{DateTime.Now}] load table `{Name}` successful ({this._records.Length})");
 				}
 				catch (Exception ex)
 				{
 					if (ex is ConfigurationErrorsException or UserExitException)
 						throw;
 
-					this._data = Array.Empty<Lazy<T>>();
+					this._records = Array.Empty<Lazy<T>>();
 					Trace.WriteLine($"[{DateTime.Now}] load table `{Name}` failed: {ex}");
 				}
 				finally
@@ -163,16 +163,16 @@ public sealed class Table<T> : IEnumerable<T>, ITable where T : BaseRecord, new(
 		var aliasAttrDef = TableDef["alias"];
 
 
+
 		List<XmlElement> tables = new();
 		foreach (var xml in xmls)
 		{
 			var root = xml.DocumentElement;
-			tables.AddRange(root.SelectNodes($"./" + TableDef.Name).OfType<XmlElement>());
+			tables.AddRange(root.SelectNodes($"./" + TableDef.OriginalName).OfType<XmlElement>());
 		}
 
-
-		this._data = new Lazy<T>[tables.Count];
-		for (var x = 0; x < this._data.Length; x++)
+		this._records = new Lazy<T>[tables.Count];
+		for (var x = 0; x < this._records.Length; x++)
 		{
 			var element = tables[x];
 
@@ -186,7 +186,7 @@ public sealed class Table<T> : IEnumerable<T>, ITable where T : BaseRecord, new(
 			var Ref = record.RecordRef;
 			if (aliasAttrDef != null) AddAlias(element.Attributes["alias"]?.Value, Ref);
 
-			this.ByRef[Ref] = this._data[x] = new(() =>
+			this.ByRef[Ref] = this._records[x] = new(() =>
 			{
 				var Object = CreateInstance(element.Attributes["type"]?.Value, out var type);
 				Object.Ref = Ref;
@@ -220,16 +220,13 @@ public sealed class Table<T> : IEnumerable<T>, ITable where T : BaseRecord, new(
 
 		var aliasAttrDef = TableDef["alias"];
 
-		this._data = new Lazy<T>[table.Records.Count];
-		for (var x = 0; x < this._data.Length; x++)
+		this._records = new Lazy<T>[table.Records.Count];
+		for (var x = 0; x < this._records.Length; x++)
 		{
 			var record = table.Records[x];
-			//if (record is null) continue;
-
 			if (aliasAttrDef != null) AddAlias(record.StringLookup.GetString(record.Get<int>(aliasAttrDef.Offset)), record.RecordRef);
 
-
-			this.ByRef[record.RecordRef] = this._data[x] = new(() =>
+			this.ByRef[record.RecordRef] = this._records[x] = new(() =>
 			{
 				var Object = CreateInstance(record.SubclassType);
 				Object.Ref = record.RecordRef;
@@ -264,7 +261,7 @@ public sealed class Table<T> : IEnumerable<T>, ITable where T : BaseRecord, new(
 				return GetLazyInfo(new Ref(id, variant));
 		}
 
-		if (this._data != null && this._data.Length != 0
+		if (this._records != null && this._records.Length != 0
 			&& typeof(T) != typeof(Text))
 			Debug.WriteLine($"[{Name}] get failed, alias: {Alias}");
 		return null;
@@ -276,7 +273,7 @@ public sealed class Table<T> : IEnumerable<T>, ITable where T : BaseRecord, new(
 
 		if (Ref.Id <= 0) return null;
 		else if (this.ByRef.TryGetValue(Ref, out var item)) return item;
-		else if (this._data != null && this._data.Length != 0)
+		else if (this._records != null && this._records.Length != 0)
 			Debug.WriteLine($"[{Name}] get failed, id: {Ref.Id} variation: {Ref.Variant}");
 
 		return null;
@@ -295,23 +292,34 @@ public sealed class Table<T> : IEnumerable<T>, ITable where T : BaseRecord, new(
 	#endregion
 
 	#region Serialize Methods
-	public void Serialize(out TableModel table)
+	public TableModel Serialize()
 	{
-		table = new TableModel();
+		var table = new TableModel()
+		{
+			ElementCount = 1,
+			Type = 14,
+			MajorVersion = 0,
+			MinorVersion = 1,
+			IsCompressed = false,
+
+			RecordCountOffset = 1,
+			Padding  = null,
+		};
 
 
 		var builder = Owner.converter.Builder;
-		builder.InitializeTable(isCompressed: false);
+		builder.InitializeTable(table.IsCompressed);
 
 		// Clear old records
 		table.Records.Clear();
 
-		foreach (var record in this.Data)
+		foreach (var record in this.Records)
 		{
 			table.Records.Add(record.Value.Serialize(this));
 		}
 
 		builder.FinalizeTable();
+		return table;
 	}
 
 	public XDocument Serialize(ReleaseSide side = default)
@@ -326,7 +334,7 @@ public sealed class Table<T> : IEnumerable<T>, ITable where T : BaseRecord, new(
 		table.SetAttributeValue("type", null);
 		table.SetAttributeValue("version", $"");
 
-		foreach (var record in this.Data)
+		foreach (var record in this.Records)
 		{
 			table.Add(record.Value.Serialize(side));
 		}
@@ -342,7 +350,7 @@ public sealed class Table<T> : IEnumerable<T>, ITable where T : BaseRecord, new(
 
 	public void Clear()
 	{
-		this._data = null;
+		this._records = null;
 
 		this.ByRef.Clear();
 		this.ByAlias.Clear();
@@ -350,11 +358,9 @@ public sealed class Table<T> : IEnumerable<T>, ITable where T : BaseRecord, new(
 
 	public IEnumerator<T> GetEnumerator()
 	{
-		if (this.Data is null)
-			yield break;
-
-		foreach (var info in this.Data)
-			yield return info.Value;
+		if (this.Records != null)
+			foreach (var info in this.Records)
+				yield return info.Value;
 
 		yield break;
 	}
@@ -379,7 +385,6 @@ public interface ITable : IEnumerable
 	/// data struct definition
 	/// </summary>
 	public TableDefinition TableDef { get; set; }
-
 
 
 
