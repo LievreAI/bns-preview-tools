@@ -40,9 +40,10 @@
 		<Using Include="Xylia.Preview.Data.Models.BinData.Table.Record" />
 	</ItemGroup>
 	<ItemGroup>
+		<PackageReference Include="CsvHelper" Version="30.0.1" />
 		<PackageReference Include="CUE4Parse-Conversion" Version="1.0.10" />
 		<PackageReference Include="HtmlAgilityPack" Version="1.11.51" />
-		<PackageReference Include="Xylia" Version="1.0.4.45" />
+		<PackageReference Include="Xylia" Version="1.0.4.52" />
 		<ProjectReference Include="..\BNSBIN\Src\BnsBinTool.Core\BnsBinTool.Core.csproj" />
 	</ItemGroup>
 	<ItemGroup>

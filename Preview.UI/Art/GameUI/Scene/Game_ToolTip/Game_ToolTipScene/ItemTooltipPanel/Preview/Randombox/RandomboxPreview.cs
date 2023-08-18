@@ -1,13 +1,12 @@
 ﻿using Xylia.Extension;
 using Xylia.Preview.Common.Arg;
 using Xylia.Preview.Common.Extension;
-using Xylia.Preview.Data.Helper;
 using Xylia.Preview.Data.Models.BinData.Table.Record;
 using Xylia.Preview.Data.Record;
 using Xylia.Preview.GameUI.Scene.Game_ToolTipScene;
 using Xylia.Preview.GameUI.Scene.Game_ToolTipScene.ItemTooltipPanel.Preview.Randombox;
-using Xylia.Preview.UI.Extension;
 using Xylia.Preview.UI.Custom.Controls;
+using Xylia.Preview.UI.Extension;
 using Xylia.Preview.UI.Resources;
 
 using static Xylia.Preview.Data.Record.Item;
@@ -80,7 +79,7 @@ public partial class RandomboxPreview : TitlePanel
 			if (!OnlyOnePage || page.HasOpenItem2)
 			{
 				ShowPicBox = true;
-				var OpenItem2 = FileCache.Data.Item[page.OpenItem2?.Item];
+				var OpenItem2 = page.OpenItem2?.Item;
 
 				#region 控件处理
 				Bitmap Icon = OpenItem2?.Icon();
@@ -222,7 +221,7 @@ public partial class RandomboxPreview : TitlePanel
 		if (e.HasOpenItem2)
 		{
 			var param = new ContentParams();
-			param[2] = FileCache.Data.Item[e.OpenItem2.Item];
+			param[2] = e.OpenItem2.Item;
 			param[3] = e.OpenItem2.StackCount;
 
 			parent.MainInfo.Insert(0, new MyInfo(

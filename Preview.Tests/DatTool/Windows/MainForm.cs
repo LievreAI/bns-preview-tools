@@ -43,8 +43,8 @@ public partial class MainForm : Form
 	{
 		this.Text = $"{this.Text}  (Build Date {AssemblyEx.BuildTime:yyMMdd})";
 		this.trackBar1.Value = this.trackBar1.Minimum;
-		this.txbDatFile.Text = Ini.ReadValue("Path", "Data_DatFile");
-		this.txbRpFolder.Text = Ini.ReadValue("Path", "Data_OutFolder");
+		this.txbDatFile.Text = Ini.Instance.ReadValue("Path", "Data_DatFile");
+		this.txbRpFolder.Text = Ini.Instance.ReadValue("Path", "Data_OutFolder");
 
 		this.ReadConfig();
 	}
@@ -75,7 +75,7 @@ public partial class MainForm : Form
 	private void SaveCheckStatus(object sender, EventArgs e)
 	{
 		var ctl = (CheckBox)sender;
-		Ini.WriteValue("Config", this.Name + "_" + ctl.Name, ctl.Checked);
+		Ini.Instance.WriteValue("Config", this.Name + "_" + ctl.Name, ctl.Checked);
 	}
 
 	private static DateTime m_LastTime = DateTime.MinValue;
@@ -116,7 +116,7 @@ public partial class MainForm : Form
 	{
 		var s = (Control)sender;
 		string Text = s.Text.Trim();
-		Ini.WriteValue("Path", "Data_DatFile", Text);
+		Ini.Instance.WriteValue("Path", "Data_DatFile", Text);
 
 		if (Directory.Exists(Text))
 		{
@@ -133,12 +133,12 @@ public partial class MainForm : Form
 
 	private void txbRpFolder_TextChanged(object sender, EventArgs e)
 	{
-		Ini.WriteValue("Path", "Data_OutFolder", ((TextBox)sender).Text);
+		Ini.Instance.WriteValue("Path", "Data_OutFolder", ((TextBox)sender).Text);
 	}
 
 	private void textBox8_TextChanged(object sender, EventArgs e)
 	{
-		if (Directory.Exists(((TextBox)sender).Text)) Ini.WriteValue("Server", "Folder", ((TextBox)sender).Text);
+		if (Directory.Exists(((TextBox)sender).Text)) Ini.Instance.WriteValue("Server", "Folder", ((TextBox)sender).Text);
 	}
 
 
@@ -380,7 +380,7 @@ public partial class MainForm : Form
 
 				var data = provider.XmlData.ExtractBin();
 				var detect = new DatafileDetect();
-				detect.Load(data);
+				detect.Read(data);
 
 				data.Tables.Dump(detect, folder, new ExportOption()
 				{

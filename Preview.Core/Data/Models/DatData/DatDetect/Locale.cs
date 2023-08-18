@@ -40,14 +40,19 @@ public sealed class Locale
 		if (Win64 is not null)
 		{
 			var version = Win64?.GetFiles("version.ini").FirstOrDefault();
-			if (version is not null) ProductVersion = Ini.ReadValue("Version", "ProductVersion", version.FullName);
+			if (version is not null)
+			{
+				var config = new Ini(version.FullName);
+				ProductVersion = config.ReadValue("Version", "ProductVersion");
+			}
 
 			var local = Win64?.GetFiles("local.ini").FirstOrDefault();
 			if (local is not null)
 			{
-				_publisher = Ini.ReadValue("Locale", "Publisher", local.FullName);
-				_language = Ini.ReadValue("Locale", "Language", local.FullName);
-				Universe = Ini.ReadValue("Locale", "Universe", local.FullName);
+				var config = new Ini(local.FullName);
+				_publisher = config.ReadValue("Locale", "Publisher");
+				_language = config.ReadValue("Locale", "Language");
+				Universe = config.ReadValue("Locale", "Universe");
 
 				return;
 			}

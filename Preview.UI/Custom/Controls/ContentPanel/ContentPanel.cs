@@ -117,8 +117,8 @@ public partial class ContentPanel : Panel
 	#region OnDoubleClick
 	public static int CopyMode
 	{
-		get => Ini.ReadValue("Preview", "copy-mode").ToInt32();
-		set => Ini.WriteValue("Preview", "copy-mode", value);
+		get => Ini.Instance.ReadValue("Preview", "copy-mode").ToInt32();
+		set => Ini.Instance.WriteValue("Preview", "copy-mode", value);
 	}
 
 	protected override void OnDoubleClick(EventArgs e)

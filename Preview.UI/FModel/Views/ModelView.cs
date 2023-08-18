@@ -230,7 +230,7 @@ public class ModelView : GameWindow
 	public bool _showFps;
 	public bool ShowFps
 	{
-		get => Ini.ReadValue("ModelViewer", "show-fps").ToBool();
-		set => Ini.WriteValue("ModelViewer", "show-fps", _showFps = value);
+		get => Ini.Instance.ReadValue("ModelViewer", "show-fps").ToBool();
+		set => Ini.Instance.WriteValue("ModelViewer", "show-fps", _showFps = value);
 	}
 }

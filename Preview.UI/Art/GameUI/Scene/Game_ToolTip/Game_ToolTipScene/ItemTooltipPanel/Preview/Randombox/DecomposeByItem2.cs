@@ -1,16 +1,16 @@
-﻿using Xylia.Preview.Data.Record;
+﻿using Xylia.Preview.Data.Helper;
+using Xylia.Preview.Data.Record;
 
 namespace Xylia.Preview.GameUI.Scene.Game_ToolTipScene.ItemTooltipPanel.Preview.Randombox;
 public sealed class DecomposeByItem2
 {
-    public Item Item;
+    private readonly string _item;
+	public int StackCount = 0;
+	public Item Item => FileCache.Data.Item[_item];
 
-    public int StackCount = 0;
-
-
-    public DecomposeByItem2(string Item, int StackCount)
+	public DecomposeByItem2(string Item, int StackCount)
     {
-        this.Item = new() { alias = Item };
+        this._item = Item;
         this.StackCount = StackCount;
     }
 }

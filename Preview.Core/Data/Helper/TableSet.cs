@@ -1,5 +1,5 @@
-﻿using BnsBinTool.Core.DataStructs;
-using BnsBinTool.Core.Definitions;
+﻿using BnsBinTool.Core.Definitions;
+using BnsBinTool.Core.Models;
 
 using Xylia.Extension.Class;
 using Xylia.Preview.Data.Models.BinData;
@@ -19,10 +19,53 @@ public class TableSet : IDisposable
 	#region Data
 	public IDataProvider Provider;
 
-	public DateTime CreatedAt;
-
+	public DatafileHeader Header;
 	public TableModel[] Tables;
 	#endregion
+
+	#region Constructor
+	public TableSet(bool unload = false)
+	{
+		if (unload)
+			return;
+
+		// simple valid same table
+		defs = DefinitionHelper.LoadTableDefinition();
+		var tableDef = defs.ToDictionary(def => def.Name.Replace("-", null).ToLower());
+
+		foreach (var member in this.GetType().GetProperties(ClassExtension.Flags))
+		{
+			var type = member.PropertyType;
+			if (typeof(ITable).IsAssignableFrom(type))
+			{
+				var table = (ITable)member.GetValue(this);
+				table.Name = member.Name;
+				table.Owner = this;
+				table.TableDef = tableDef.GetValueOrDefault(member.Name.ToLower(), null);
+			}
+		}
+	}
+	#endregion
+
+	#region Test
+	public ITable Get(short type) => Get(defs.FirstOrDefault(def => def.Type == type));
+
+	public ITable Get(string name) => Get(defs.FirstOrDefault(def => def.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase)));
+
+	public ITable Get(TableDefinition tableDef)
+	{
+		if (tableDef is null) return default;
+
+		return new Table<BaseRecord>
+		{
+			Name = tableDef.Name,
+			Owner = this,
+			TableDef = tableDef,
+		};
+	}
+	#endregion
+
+
 
 	#region Tables
 	public Table<AccountLevel> AccountLevel { get; } = new();
@@ -134,70 +177,18 @@ public class TableSet : IDisposable
 	public Table<ZoneEnv2> ZoneEnv2 { get; } = new();
 	#endregion
 
-
-	//public ITable this[short type]
-	//{
-	//	get
-	//	{
-	//		var tableDef = tableDefinitions.ToDictionary(def => def.Name.Replace("-", null).ToLower());
-
-	//		return new Table<BaseRecord>
-	//		{
-
-	//		};
-	//	}
-	//}
-
-
-	#region Constructor
-	public TableSet(bool unload = false)
-	{
-		if (unload)
-			return;
-
-		// simple valid same table
-		tableDefinitions = DefinitionHelper.LoadTableDefinition();
-		var tableDef = tableDefinitions.ToDictionary(def => def.Name.Replace("-", null).ToLower());
-
-		foreach (var member in this.GetType().GetProperties(ClassExtension.Flags))
-		{
-			var type = member.PropertyType;
-			if (typeof(ITable).IsAssignableFrom(type))
-			{
-				var table = (ITable)member.GetValue(this);
-				table.Name = member.Name;
-				table.Owner = this;
-				table.TableDef = tableDef.GetValueOrDefault(member.Name.ToLower(), null);
-			}
-		}
-	}
-	#endregion
-
 	#region Helper
-	protected List<TableDefinition> tableDefinitions;
+	protected List<TableDefinition> defs;
 
 	private DatafileConverter _converter;
 	public DatafileConverter converter
 	{
 		private set => _converter = value;
-		get => _converter ?? new DatafileConverter(new DatafileDefinition(tableDefinitions.DistinctBy(o => o.Type).ToList()), null);
+		get => _converter ?? new DatafileConverter(new DatafileDefinition(defs.DistinctBy(o => o.Type).ToList()), null);
 	}
 
 	public DatafileDetect detect = new();
 
-
-	protected void LoadConverter(bool mergeDuplicatedSequences = false)
-	{
-		// transfer to 
-		detect.ConvertTableName(tableDefinitions);
-
-		var defs = tableDefinitions.DistinctBy(o => o.Type).ToList();
-		var datafileDeinition = new DatafileDefinition(defs) { Is64Bit = Provider?.is64Bit() ?? true };
-		datafileDeinition.SequenceDefinitions.AddRange(new SequenceDefinitionLoader().LoadFor(defs, mergeDuplicatedSequences));
-
-		// set converter
-		this.converter = new DatafileConverter(datafileDeinition, this.Tables);
-	}
 
 	public virtual void LoadData(bool UseDB = true, string Folder = null)
 	{
@@ -209,10 +200,10 @@ public class TableSet : IDisposable
 			var data = provider.XmlData.ExtractBin();
 			var local = provider.LocalData.ExtractBin();
 
+			this.Header = data;
 			this.Tables = data.Tables.Concat(local.Tables).ToArray();
-			this.CreatedAt = data.CreatedAt;
 
-			detect.Load(this.Tables, data.NameTable.CreateTable());
+			detect.Read(this.Tables, data.NameTable.CreateTable());
 			this.LoadConverter();
 
 			if (Settings.TestMode == DumpMode.Full)
@@ -220,21 +211,18 @@ public class TableSet : IDisposable
 		}
 	}
 
-
-	public void Test()
+	protected void LoadConverter(bool mergeDuplicatedSequences = false)
 	{
-		// create temp map
-		detect.Load(tableDefinitions);
-		this.LoadConverter();
+		detect.ConvertName(this.defs);
 
-		foreach (var table in tableDefinitions)
-		{
-			var byRef = new Dictionary<Ref, string>();
-			var byAlias = new Dictionary<string, Ref>();
+		var defs = this.defs.DistinctBy(o => o.Type).ToList();
+		var datafileDeinition = new DatafileDefinition(defs) { Is64Bit = Provider?.is64Bit() ?? true };
+		datafileDeinition.SequenceDefinitions.AddRange(new SequenceDefinitionLoader().LoadFor(defs, mergeDuplicatedSequences));
 
-			_converter._tablesAliases.ByRef[table.Type] = byRef;
-			_converter._tablesAliases.ByAlias[table.Type] = byAlias;
-		}
+		// set converter
+		this.converter = new DatafileConverter(datafileDeinition, this.Tables);
+
+		detect.Write(this);
 	}
 	#endregion
 
@@ -248,25 +236,4 @@ public class TableSet : IDisposable
 		GC.SuppressFinalize(this);
 	}
 	#endregion
-}
-
-
-public sealed class LocalDataTableSet : TableSet
-{
-	private readonly string datpath;
-	public LocalDataTableSet(string DatPath) : base() => this.datpath = DatPath;
-
-
-	public override void LoadData(bool UseDB, string Folder)
-	{
-		if (Tables is not null) return;
-
-
-		var local = new BNSDat(datpath).ExtractBin();
-
-		this.Tables = local.Tables.ToArray();
-		detect.Load(this.Tables, null);
-
-		this.LoadConverter();
-	}
 }

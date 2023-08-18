@@ -8,7 +8,6 @@ using Xylia.Preview.Common.Arg;
 using Xylia.Preview.Common.Extension;
 using Xylia.Preview.Common.Seq;
 using Xylia.Preview.Data.Helper;
-using Xylia.Preview.Data.Models.DatData.DataProvider;
 using Xylia.Preview.Data.Models.DatData.DatDetect;
 using Xylia.Preview.Data.Record;
 using Xylia.Preview.GameUI.Scene.Game_ToolTip.ItemTooltipPanel.Preview.Randombox;
@@ -41,7 +40,7 @@ public partial class ItemTooltipPanel : Form
 		this.ItemInfo = ItemInfo;
 
 
-		if (bool.TryParse(Ini.ReadValue("Preview", "item#option_UseUserOperPanel"), out bool f1))
+		if (bool.TryParse(Ini.Instance.ReadValue("Preview", "item#option_UseUserOperPanel"), out bool f1))
 			this.MenuItem_SwitchUserOperPanel.Checked = f1;
 
 		Loading = false;
@@ -113,7 +112,7 @@ public partial class ItemTooltipPanel : Form
 			//保证焦点不会转移
 			this.Activate();
 
-			Ini.WriteValue("Preview", "item#option_UseUserOperPanel", this.MenuItem_SwitchUserOperPanel.Checked);
+			Ini.Instance.WriteValue("Preview", "item#option_UseUserOperPanel", this.MenuItem_SwitchUserOperPanel.Checked);
 		}
 	}
 
@@ -121,7 +120,7 @@ public partial class ItemTooltipPanel : Form
 	{
 		if (Loading) return;
 
-		Ini.WriteValue("Preview", "item#option_ShowCategory3", this.lbl_Category.Visible);
+		Ini.Instance.WriteValue("Preview", "item#option_ShowCategory3", this.lbl_Category.Visible);
 	}
 
 
@@ -511,15 +510,13 @@ public partial class ItemTooltipPanel : Form
 		if (AccountPostCharge != null)
 		{
 			var param = new ContentParams();
-			param[2] = AccountPostCharge.ChargeItem1;
-			param[3] = AccountPostCharge.ChargeItemAmount1;
-			param[4] = AccountPostCharge.ChargeItem2;
-			param[5] = AccountPostCharge.ChargeItemAmount2;
+			var item1 = param[2] = AccountPostCharge.ChargeItem.Get(1);
+			param[3] = AccountPostCharge.ChargeItemAmount.Get(1);
+			var item2 = param[4] = AccountPostCharge.ChargeItem.Get(2);
+			param[5] = AccountPostCharge.ChargeItemAmount.Get(2);
 
-			if (!AccountPostCharge.ChargeItem1.INVALID())
-				ExtraInfo += param.Handle(AccountPostCharge.ChargeItem2.INVALID() ?
-					"UI.ItemTooltip.DeliveryCharge1" :
-					"UI.ItemTooltip.DeliveryCharge2");
+			if (item1 != null && item2 == null) ExtraInfo += "UI.ItemTooltip.DeliveryCharge1";
+			if (item1 != null && item2 != null) ExtraInfo += "UI.ItemTooltip.DeliveryCharge2";
 		}
 		#endregion
 

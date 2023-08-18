@@ -40,7 +40,7 @@ public sealed partial class Game_ItemStoreScene : StoreScene
 		Source.Insert(0, resources.GetString("Filter_All"));
 		this.JobSelector.Source = Source;
 
-		var LastJobSelect = Ini.ReadValue("Preview", "JobFilter");
+		var LastJobSelect = Ini.Instance.ReadValue("Preview", "JobFilter");
 		this.JobSelector.TextValue = Source.Contains(LastJobSelect) ? LastJobSelect : this.JobSelector.Source.FirstOrDefault();
 		#endregion
 
@@ -129,7 +129,7 @@ public sealed partial class Game_ItemStoreScene : StoreScene
 
 	private void JobSelector_SelectedChangedEvent(object sender, EventArgs e)
 	{
-		Ini.WriteValue("Preview", "JobFilter", this.JobSelector.TextValue);
+		Ini.Instance.WriteValue("Preview", "JobFilter", this.JobSelector.TextValue);
 		this.TreeView_AfterSelect(null, null);
 	}
 

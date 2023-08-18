@@ -25,7 +25,7 @@ public sealed class Text : BaseRecord, IOut
 
 public static class TextExtension
 {
-	public static LocalDataTableSet data_replace = null; 
+	public static TableSet_Local data_replace = null; 
 
 	public static string GetText(this string Alias, bool ReturnNull = false)
 	{

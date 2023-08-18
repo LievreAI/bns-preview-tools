@@ -19,7 +19,7 @@ internal sealed class RewardPage
     #endregion
 
     #region Properties
-    public bool HasOpenItem2 => !OpenItem2?.Item.INVALID() ?? false;
+    public bool HasOpenItem2 => OpenItem2?.Item != null;
 
     public IAttributeCollection Attrs => DecomposeReward?.Attributes;
     #endregion

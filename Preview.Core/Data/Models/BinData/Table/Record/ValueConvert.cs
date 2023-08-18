@@ -1,4 +1,5 @@
 ﻿using BnsBinTool.Core.DataStructs;
+using BnsBinTool.Core.Definitions;
 
 using Xylia.Extension;
 using Xylia.Preview.Common.Attribute;
@@ -8,10 +9,11 @@ using Xylia.Preview.Common.Struct;
 namespace Xylia.Preview.Data.Models.BinData.Table.Record;
 public static class ValueConvert
 {
-	public static object Construct(Type type, string value , BaseRecord Source = null)
-	{
-		if (string.IsNullOrEmpty(value)) return default;
+	public static object Construct(AttributeType type, string value, BaseRecord Source = null) => throw new NotImplementedException();
 
+	public static object Construct(Type type, string value , BaseRecord Source = null)
+	{  
+		if (string.IsNullOrEmpty(value)) return default;                    /// <see cref="AttributeType.TNone">
 		if (type == typeof(sbyte)) return sbyte.Parse(value);				/// <see cref="AttributeType.TInt8">
 		else if (type == typeof(short)) return short.Parse(value);			/// <see cref="AttributeType.TInt16">
 		else if (type == typeof(int)) return int.Parse(value);				/// <see cref="AttributeType.TInt32">
@@ -19,14 +21,14 @@ public static class ValueConvert
 		else if (type == typeof(float)) return float.Parse(value);			/// <see cref="AttributeType.TFloat32">
 		else if (type == typeof(bool)) return value.ToBool();				/// <see cref="AttributeType.TBool">
 		else if (type == typeof(string)) return value;						/// <see cref="AttributeType.TString">
-
-		else if (type.IsEnum)
+		else if (type.IsEnum)                                               
 		{
 			if (value.TryParseToEnum(type, out var seq, Extension: true)) return seq;
 			throw new FormatException($"Seq `{type.Name}` cast failed: {value}");
-		}
+		}                                            /// <see cref="AttributeType.TSeq">
+
 		else if (type == typeof(BaseRecord)) return value.CastObject();		/// use base class mean as <see cref="AttributeType.TTRef">
-		else if (typeof(BaseRecord).IsAssignableFrom(type))      /// use sub class mean as <see cref="AttributeType.TRef">
+		else if (typeof(BaseRecord).IsAssignableFrom(type))                 /// use sub class mean as <see cref="AttributeType.TRef">
 		{
 			// InvalidOperationException: ValueFactory attempted to access the Value property of this instance.
 			// this mean object conflicts occurred:	  eg. Item -> Card -> Item   
@@ -54,6 +56,8 @@ public static class ValueConvert
 
 			return obj;
 		}
+																			/// <see cref="AttributeType.TSub">
+																			/// <see cref="AttributeType.TSu">
 																			/// <see cref="AttributeType.TVector16">
 																			/// <see cref="AttributeType.TVector32">
 		else if (type == typeof(IColor)) return IColor.Parse(value);        /// <see cref="AttributeType.TIColor">
@@ -61,7 +65,15 @@ public static class ValueConvert
 		else if (type == typeof(Box)) return Box.Parse(value);              /// <see cref="AttributeType.TBox">
 																			/// <see cref="AttributeType.TAngle">
 		else if (type == typeof(Msec)) return new Msec(int.Parse(value));   /// <see cref="AttributeType.TMsec">
+																			/// <see cref="AttributeType.TDistance">
+																			/// <see cref="AttributeType.TVelocity">
+																			/// 
 		else if (type == typeof(Script_obj)) return new Script_obj(value);  /// <see cref="AttributeType.TScript_obj">
+																			/// <see cref="AttributeType.TNative">
+		else if (type == typeof(FVersion)) return new FVersion(value); 		/// <see cref="AttributeType.TVersion">
+																			/// <see cref="AttributeType.TIcon">
+																			/// <see cref="AttributeType.TTime32">
+																			/// <see cref="AttributeType.TTime64">
 		else if (type == typeof(DateTime)) return DateTime.Parse(value);    /// <see cref="AttributeType.TXUnknown1">
 		else if (type == typeof(Time64)) return Time64.Parse(value);
 		else if (type == typeof(FPath)) return new FPath(value);            /// <see cref="AttributeType.TXUnknown2">

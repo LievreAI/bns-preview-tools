@@ -3,8 +3,10 @@ using System.Diagnostics;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+using Xylia.Extension;
 using Xylia.Preview.Data.Helper;
 using Xylia.Preview.Data.Models.BinData.AliasTable;
+using Xylia.Preview.Data.Models.BinData.Table.Record;
 using Xylia.Preview.Data.Models.DatData;
 using Xylia.Preview.Data.Models.DatData.DataProvider;
 using Xylia.Preview.Data.Models.Definition;
@@ -39,13 +41,13 @@ public class TableTests
 	}
 
 
-	[TestMethod]
+	//[TestMethod]
 	[DataRow(1)]
 	public void QuestTest(int id)
 	{
-		//FileCache.Data.Provider = new FolderProvider(@"D:\资源\客户端相关\Auto\data");
+		FileCache.Data.Provider = new FolderProvider(@"D:\资源\客户端相关\Auto\data");
 
-		var _table = FileCache.Data.AttractionGroup;
+		var _table = FileCache.Data.ItemCombat;
 		var _record = _table[id];
 
 
@@ -53,12 +55,8 @@ public class TableTests
 		//var resolved = _table.Owner.converter._tablesAliases;
 		//DatafileAliasResolverHelper.Resolve(resolved, FileCache.Data.AttractionGroup);
 
-		// debug
-		//Console.WriteLine(_record);
-		//Console.WriteLine(_record.Serialize().Data.ToHex(true));
 
-		var table = _table.Serialize();
-		Trace.WriteLine(BitConverter.ToString(table.ToArray(true)));
+		Console.WriteLine(_record.Data.ToHex(true));
 	}
 
 
@@ -66,9 +64,16 @@ public class TableTests
 	[TestMethod]
 	public void Test2()
 	{
+		FileCache.Data.Provider = DefaultProvider.Load(CommonPath.GameFolder);  //new FolderProvider(@"D:\资源\客户端相关\Auto\data");
+		foreach (BaseRecord record in FileCache.Data.Get("account-level"))
+		{
+			Trace.WriteLine(record.Attributes);
+		}
+
+
+
 		//var table =  ClientConfiguration.LoadFrom();
 		//table.Test();
-
 
 
 		//foreach (var record in Data.FileCache.Data.TextData.Where(r => 
@@ -119,7 +124,7 @@ public sealed class TestSet : TableSet
 		if (true)
 		{
 			var AliasTable = data.NameTable.CreateTable();
-			this.detect.Load(this.Tables, AliasTable);
+			this.detect.Read(this.Tables, AliasTable);
 		}
 	}
 
@@ -129,10 +134,10 @@ public sealed class TestSet : TableSet
 	/// <param name="files"></param>
 	public void Output(params string[] files)
 	{
-		tableDefinitions = DefinitionHelper.LoadTableDefinition(files);
+		defs = DefinitionHelper.LoadTableDefinition(files);
 		this.LoadConverter();
 
-		Parallel.ForEach(tableDefinitions, def =>
+		Parallel.ForEach(defs, def =>
 		{
 			var table = Tables.FirstOrDefault(o => o.Type == def.Type);
 			if (table is null) return;

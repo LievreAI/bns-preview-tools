@@ -26,8 +26,8 @@ public partial class Frm1 : Form
 
 	private void DevTools_Shown(object sender, EventArgs e)
 	{
-		textBox3.Text = Xylia.Configure.Ini.ReadValue("Hex", textBox3.Name);
-		textBox4.Text = Xylia.Configure.Ini.ReadValue("Hex", textBox4.Name);
+		textBox3.Text = Xylia.Configure.Ini.Instance.ReadValue("Hex", textBox3.Name);
+		textBox4.Text = Xylia.Configure.Ini.Instance.ReadValue("Hex", textBox4.Name);
 	}
 
 	private void Button4_Click(object sender, EventArgs e)
@@ -229,7 +229,7 @@ public partial class Frm1 : Form
 			if (!string.IsNullOrWhiteSpace(HexText.Text))
 				LengthShow.Text = $"长度：{HexText.Text.StringUnzip().Length / 2}";
 
-			Xylia.Configure.Ini.WriteValue("Hex", HexText.Name, HexText.Text);
+			Xylia.Configure.Ini.Instance.WriteValue("Hex", HexText.Name, HexText.Text);
 		}
 		catch (Exception ee)
 		{

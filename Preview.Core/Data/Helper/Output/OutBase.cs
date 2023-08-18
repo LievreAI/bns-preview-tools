@@ -35,12 +35,12 @@ public abstract partial class OutBase
 					Filter = "Excel Files|*.xlsx",
 					FileName = $"{Name} ({DateTime.Now.ToString(res.GetString("Format_yyMM"))}).xlsx",
 
-					InitialDirectory = Ini.ReadValue("Folder", "OutputExcel")
+					InitialDirectory = Ini.Instance.ReadValue("Folder", "OutputExcel")
 				};
 				if (save.ShowDialog() != DialogResult.OK) return;
 
 				path = save.FileName;
-				Ini.WriteValue("Folder", "OutputExcel", Path.GetDirectoryName(path));
+				Ini.Instance.WriteValue("Folder", "OutputExcel", Path.GetDirectoryName(path));
 				msg?.Invoke(res.GetString("output_start"));
 			} 
 		}

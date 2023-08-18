@@ -6,7 +6,6 @@ using HZH_Controls.Forms;
 
 using Xylia.Configure;
 using Xylia.Match.Util.Paks.Textures;
-using Xylia.Preview.Common.Extension;
 using Xylia.Preview.GameUI.Scene.Game_ToolTip.ItemTooltipPanel.Cell;
 using Xylia.Preview.Properties;
 using Xylia.Preview.UI.Extension;
@@ -55,12 +54,9 @@ public partial class IconPage : UserControl
 
 	private void IconOperator_Load(object sender, EventArgs e)
 	{
-		//Initialize文本框路径
-		//this.ReadConfig(this.GetType().Name);
-
-		Path_ResultPath.Text = Ini.ReadValue(this.GetType(), "OutFolder");
+		Path_ResultPath.Text = Ini.Instance.ReadValue(this.GetType(), "OutFolder");
 		Path_GameFolder.Text = CommonPath.GameFolder;
-		TextBox1.Text = Ini.ReadValue(this.GetType(), "CacheList");
+		TextBox1.Text = Ini.Instance.ReadValue(this.GetType(), "CacheList");
 
 
 		#region Load 输出格式设置
@@ -72,14 +68,14 @@ public partial class IconPage : UserControl
 		};
 
 
-		string FormatSel = Ini.ReadValue(this.GetType(), "FormatSel");
+		string FormatSel = Ini.Instance.ReadValue(this.GetType(), "FormatSel");
 
 		if (string.IsNullOrWhiteSpace(FormatSel) || !FormatSel.Contains('[')) FormatSelect.TextValue = FormatSelect.Source?.First().ToString();
 		else FormatSelect.TextValue = FormatSel;
 		#endregion
 
-		if (bool.TryParse(Ini.ReadValue(this.GetType(), "Mode"), out bool Result)) Switch_Mode.Checked = Result;
-		if (bool.TryParse(Ini.ReadValue(this.GetType(), "HasBG"), out Result)) checkBox1.Checked = Result;
+		if (bool.TryParse(Ini.Instance.ReadValue(this.GetType(), "Mode"), out bool Result)) Switch_Mode.Checked = Result;
+		if (bool.TryParse(Ini.Instance.ReadValue(this.GetType(), "HasBG"), out Result)) checkBox1.Checked = Result;
 	}
 	#endregion
 
@@ -94,11 +90,11 @@ public partial class IconPage : UserControl
 		frmAnchor = FrmAnchorTips.ShowTips(FormatSelect, Msg, AnchorTipsLocation.BOTTOM, Color.MediumOrchid, Color.FloralWhite, null, 12, 0, false);
 	}
 
-	private void FormatSelect_TextChanged(object sender, EventArgs e) => Ini.WriteValue(this.GetType(), "FormatSel", FormatSelect.TextValue);
+	private void FormatSelect_TextChanged(object sender, EventArgs e) => Ini.Instance.WriteValue(this.GetType(), "FormatSel", FormatSelect.TextValue);
 
-	private void Path_ResultPath_TextChanged(object sender, EventArgs e) => Ini.WriteValue(this.GetType(), "OutFolder", Path_ResultPath.Text);
+	private void Path_ResultPath_TextChanged(object sender, EventArgs e) => Ini.Instance.WriteValue(this.GetType(), "OutFolder", Path_ResultPath.Text);
 
-	private void TextBox1_TextChanged(object sender, EventArgs e) => Ini.WriteValue(this.GetType(), "CacheList", TextBox1.Text);
+	private void TextBox1_TextChanged(object sender, EventArgs e) => Ini.Instance.WriteValue(this.GetType(), "CacheList", TextBox1.Text);
 
 	private void Path_GameFolder_TextChanged(object sender, EventArgs e) => CommonPath.GameFolder = ((Control)sender).Text;
 
@@ -115,12 +111,12 @@ public partial class IconPage : UserControl
 	private void Btn_Search_3_Click(object sender, EventArgs e)
 	{
 		Open.Filter = "数据配置文件|*.chv|All files|*.*";
-		if (int.TryParse(Ini.ReadValue(this.GetType(), "CacheListFilter"), out int Result)) Open.FilterIndex = Result;
+		if (int.TryParse(Ini.Instance.ReadValue(this.GetType(), "CacheListFilter"), out int Result)) Open.FilterIndex = Result;
 
 		if (Open.ShowDialog() == DialogResult.OK)
 		{
 			TextBox1.Text = Open.FileName;
-			Ini.WriteValue(this.GetType(), "CacheListFilter", Open.FilterIndex);
+			Ini.Instance.WriteValue(this.GetType(), "CacheListFilter", Open.FilterIndex);
 		}
 	}
 
@@ -154,7 +150,7 @@ public partial class IconPage : UserControl
 	{
 		if (IsInitialization) return;
 
-		Ini.WriteValue(this.GetType(), "Mode", Switch_Mode.Checked);
+		Ini.Instance.WriteValue(this.GetType(), "Mode", Switch_Mode.Checked);
 		//FrmAnchorTips.CloseLastTip();
 		Switch_Mode_MouseEnter(null, null);
 	}
@@ -213,7 +209,7 @@ public partial class IconPage : UserControl
 	{
 		if (IsInitialization) return;
 
-		Ini.WriteValue(this.GetType(), "HasBG", checkBox1.Checked);
+		Ini.Instance.WriteValue(this.GetType(), "HasBG", checkBox1.Checked);
 
 		//FrmAnchorTips.CloseLastTip();
 		Switch_HasBG_MouseEnter(null, null);

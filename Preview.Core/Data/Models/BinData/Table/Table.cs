@@ -91,7 +91,6 @@ public sealed class Table<T> : IEnumerable<T>, ITable where T : BaseRecord, new(
 	#endregion
 
 
-
 	#region Load Methods
 	private bool InLoading = false;
 
@@ -315,7 +314,8 @@ public sealed class Table<T> : IEnumerable<T>, ITable where T : BaseRecord, new(
 
 		foreach (var record in this.Records)
 		{
-			table.Records.Add(record.Value.Serialize(this));
+			record.Value.Serialize(this);
+			table.Records.Add(record.Value);
 		}
 
 		builder.FinalizeTable();

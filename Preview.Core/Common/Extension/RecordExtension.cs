@@ -14,6 +14,7 @@ using Xylia.Xml;
 namespace Xylia.Preview.Common.Extension;
 public static partial class RecordExtension
 {
+	#region GetParam
 	public static object GetParam<T>(this T Object, string ParamName) => Object.TryGetParam(ParamName, out object Value) ? Value : null;
 
 	public static bool TryGetParam<T>(this T Object, string ParamName, out object Value)
@@ -46,17 +47,7 @@ public static partial class RecordExtension
 
 
 	public static string GetSignal(this object EnumItem) => EnumItem.GetAttribute<Signal>()?.Description ?? (EnumItem is MemberInfo m ? m.Name : EnumItem.ToString());
-
-	public static bool INVALID(this BaseRecord record)
-	{
-		if (record is null) return true;
-
-		if (record.ContainAttribute<AliasRecord>())
-			return string.IsNullOrWhiteSpace(record.alias);
-
-		return false;
-	}
-
+	#endregion
 
 	#region GetName
 	public static string GetName(this string ObjInfo) => ObjInfo.CastObject()?.GetName() ?? ObjInfo;
@@ -74,8 +65,6 @@ public static partial class RecordExtension
 	#endregion
 
 
-
-
 	public static T CreateNew<T>(params IAttribute[] attrs) where T : BaseRecord, new()
 	{
 		var xe = new XElement("record");
@@ -83,6 +72,20 @@ public static partial class RecordExtension
 
 		var item = new T();
 		item.LoadData(new XElementData(xe.LinqTo()));
+		return item;
+	}
+
+	public static T Get<T>(this T[] array, int num)
+	{
+		if (array.Length < num) return default;
+
+		var item = array[num - 1];
+		if (item is BaseRecord record)
+		{
+			if (record.ContainAttribute<AliasRecord>() && string.IsNullOrWhiteSpace(record.alias))
+				return default;
+		}
+
 		return item;
 	}
 }

@@ -77,13 +77,13 @@
     <PackageReference Include="LiveCharts" Version="0.9.7">
       <NoWarn>NU1701;NU1702</NoWarn>
     </PackageReference>
-    <PackageReference Include="LiveCharts.WinForms" Version="0.9.7.1" >
+    <PackageReference Include="LiveCharts.WinForms" Version="0.9.7.1">
       <NoWarn>NU1701;NU1702</NoWarn>
     </PackageReference>
-    <PackageReference Include="LiveCharts.Wpf" Version="0.9.7" >
+    <PackageReference Include="LiveCharts.Wpf" Version="0.9.7">
       <NoWarn>NU1701;NU1702</NoWarn>
     </PackageReference>
-    <PackageReference Include="Xylia" Version="1.0.4.45" />
+    <PackageReference Include="Xylia" Version="1.0.4.52" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BNSBIN\Src\BnsBinTool.Core\BnsBinTool.Core.csproj" />

@@ -58,7 +58,7 @@ public partial class DatSelect : Form, IDatSelect
 
 	private void Chk_64bit_CheckedChanged(object sender, EventArgs e)
 	{
-		Ini.WriteValue("DatSelect", "64bit", this.Chk_64bit.Checked);
+		Ini.Instance.WriteValue("DatSelect", "64bit", this.Chk_64bit.Checked);
 
 		Chk_HidenBpFiles_CheckedChanged(null, null);
 	}
@@ -152,7 +152,7 @@ public partial class DatSelect : Form, IDatSelect
 	{
 		this.list_xml = Xml;
 		this.list_local = Local;
-		this.Chk_64bit.Checked = Ini.ReadValue("DatSelect", "64bit").ToBool();
+		this.Chk_64bit.Checked = Ini.Instance.ReadValue("DatSelect", "64bit").ToBool();
 
 		if (!Xml.Has32bit() && !Local.Has32bit())
 		{

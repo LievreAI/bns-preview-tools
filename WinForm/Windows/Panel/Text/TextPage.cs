@@ -25,15 +25,15 @@ public partial class TextPage : UserControl
 
 		this.BackColor = Color.Transparent;
 
-		this.Path_Local1.Text = Ini.ReadValue(this.GetType(), nameof(Path_Local1));
-		this.Path_Local2.Text = Ini.ReadValue(this.GetType(), nameof(Path_Local2));
-		this.SaveAsBin.Checked = Ini.ReadValue(this.GetType(), nameof(SaveAsBin)).ToBool();
-		this.TextBox2.Text = Ini.ReadValue(this.GetType(), nameof(TextBox2));
+		this.Path_Local1.Text = Ini.Instance.ReadValue(this.GetType(), nameof(Path_Local1));
+		this.Path_Local2.Text = Ini.Instance.ReadValue(this.GetType(), nameof(Path_Local2));
+		this.SaveAsBin.Checked = Ini.Instance.ReadValue(this.GetType(), nameof(SaveAsBin)).ToBool();
+		this.TextBox2.Text = Ini.Instance.ReadValue(this.GetType(), nameof(TextBox2));
 
 
 		this.ucCheckBox1.Checked = false;
 
-		string OutPath = Ini.ReadValue(this.GetType(), nameof(TextBox1));
+		string OutPath = Ini.Instance.ReadValue(this.GetType(), nameof(TextBox1));
 		this.filePath.Text = this.Local_SourcePath;
 		if (!string.IsNullOrWhiteSpace(OutPath) && File.Exists(OutPath)) TextBox1.Text = OutPath;
 		else TextBox1.Text = Path.GetDirectoryName(filePath.Text) + @"\汉化数据.xlsx";
@@ -54,7 +54,7 @@ public partial class TextPage : UserControl
 		if (!string.IsNullOrWhiteSpace(path) && File.Exists(path))
 		{
 			ext = Path.GetExtension(path);
-			Ini.WriteValue(this.GetType(), ((Control)sender).Name, path);
+			Ini.Instance.WriteValue(this.GetType(), ((Control)sender).Name, path);
 		}
 
 		//显示输出按钮
@@ -92,7 +92,7 @@ public partial class TextPage : UserControl
 	{
 		new Thread(act =>
 		{
-			using var set = new LocalDataTableSet(Source);
+			using var set = new TableSet_Local(Source);
 			var table = set.Text;
 			table.Load();
 
@@ -299,7 +299,7 @@ public partial class TextPage : UserControl
 		}
 		else
 		{
-			Table = new LocalDataTableSet(file.FullName).Text;
+			Table = new TableSet_Local(file.FullName).Text;
 		}
 			
 
@@ -318,7 +318,7 @@ public partial class TextPage : UserControl
 
 	private const string OutputFilter = "受支持的文件|*.xlsx;*.xls;*.xml|Excel Files|*.xlsx;*.xls|Xml Files|*.xml|All files|*.*";
 
-	public string Local_SourcePath { get => Ini.ReadValue(this.GetType(), "SourcePath"); set => Ini.WriteValue(this.GetType(), "SourcePath", value); }
+	public string Local_SourcePath { get => Ini.Instance.ReadValue(this.GetType(), "SourcePath"); set => Ini.Instance.WriteValue(this.GetType(), "SourcePath", value); }
 
 	private void ucBtnFillet5_BtnClick(object sender, EventArgs e)
 	{

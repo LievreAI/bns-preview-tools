@@ -69,11 +69,8 @@ public sealed class DecomposeInfo
 
 	private static Bitmap GetExtra(Item item2)
 	{
-		if (item2.INVALID())
-			return null;
-
-		var Item2Info = FileCache.Data.Item[item2];
-		if (Item2Info != null && Item2Info is Grocery grocery && grocery.GroceryType == GroceryTypeSeq.Key) return Resource_BNSR.unuseable_KeyLock;
+		if (item2 is null) return null;
+		else if (item2 is Grocery grocery && grocery.GroceryType == GroceryTypeSeq.Key) return Resource_BNSR.unuseable_KeyLock;
 		else return Resource_BNSR.Weapon_Lock_04;
 	}
 	#endregion

@@ -18,10 +18,8 @@ using Xylia.Preview.Common.Extension;
 using Xylia.Preview.Data.Models.BinData.Table.Record.Attributes;
 using Xylia.Xml;
 
-using RecordModel = BnsBinTool.Core.Models.Record;
-
 namespace Xylia.Preview.Data.Models.BinData.Table.Record;
-public class BaseRecord
+public class BaseRecord : BnsBinTool.Core.Models.Record
 {
 	public static bool TempSwitch = true;
 
@@ -205,7 +203,7 @@ public class BaseRecord
 
 
 
-	public RecordModel Serialize(ITable table = null, RecordBuilder _recordBuilder = null)
+	public void Serialize(ITable table = null, RecordBuilder _recordBuilder = null)
 	{
 		table ??= this.GetType().Name.CastTable();
 		ArgumentNullException.ThrowIfNull(table);
@@ -218,15 +216,13 @@ public class BaseRecord
 		_recordBuilder.InitializeRecord();
 
 		// Create record
-		var def = table.TableDef;
-		var record = new RecordModel
-		{
-			Data = new byte[def.Size],
-			XmlNodeType = 1,
-			SubclassType = def.SubclassType,
-			DataSize = def.Size,
-			StringLookup = _recordBuilder.StringLookup, 
-		};
+		var def = table.TableDef;			
+
+		this.Data = new byte[def.Size];
+		this.XmlNodeType = 1;
+		this.SubclassType = def.SubclassType;
+		this.DataSize = def.Size;
+		this.StringLookup = _recordBuilder.StringLookup;
 
 		// Go through each attribute
 		//AttributeDefaultValues.SetRecordDefaults(record, this);
@@ -234,16 +230,15 @@ public class BaseRecord
 		{
 			try
 			{
-				_recordBuilder.SetAttribute(record, attr, Attributes[attr.Name]);
+				_recordBuilder.SetAttribute(this, attr, Attributes[attr.Name]);
 			}
 			catch
 			{
-				
+
 			}
 		}
 
 		_recordBuilder.FinalizeRecord();
-		return record;
 	}
 
 	public XNode Serialize(ReleaseSide side, ITableDefinition el = null)
@@ -330,5 +325,16 @@ public class BaseRecord
 		}
 
 		return node;
+	}
+
+
+
+	public override byte[] Data 
+	{ 
+		get
+		{
+			this.Serialize();
+			return this.Data;
+		}
 	}
 }

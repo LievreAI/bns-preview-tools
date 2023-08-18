@@ -69,8 +69,8 @@ public partial class QuestSelector : Form
 	#region Functions
 	public static int LastRule
 	{
-		get => Ini.ReadValue("Preview", "quest#last").ToInt32();
-		set => Ini.WriteValue("Preview", "quest#last", value);
+		get => Ini.Instance.ReadValue("Preview", "quest#last").ToInt32();
+		set => Ini.Instance.WriteValue("Preview", "quest#last", value);
 	}
 
 	public void LoadData()

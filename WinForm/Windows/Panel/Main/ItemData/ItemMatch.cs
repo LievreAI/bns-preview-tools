@@ -1,7 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.IO;
 
-using Xylia.Extension;
 using Xylia.Match.Util.ItemData;
 using Xylia.Match.Util.ItemMatch.Util;
 using Xylia.Preview.Data.Helper;
@@ -40,7 +39,7 @@ public sealed class ItemMatch
 	#endregion
 
 	#region Data
-	DateTime CreatedAt;
+	DateTime? CreatedAt;
 
 	List<ItemDataInfo> ItemDatas;
 
@@ -53,7 +52,7 @@ public sealed class ItemMatch
 		TableSet set = new();
 		set.LoadData();
 
-		CreatedAt = set.CreatedAt;
+		CreatedAt = set.Header?.CreatedAt;
 
 
 		set.Item.Load();
@@ -120,8 +119,10 @@ public sealed class ItemMatch
 		};
 
 
-		XList cache = new();
-		cache.DataTime = CreatedAt.GetTimeStamp();
+		XList cache = new()
+		{
+			DataTime = CreatedAt?.Ticks ?? 0
+		};
 
 		if (CacheList != null) cache.datas.AddRange(CacheList);
 		cache.datas.AddRange(this.ItemDatas.Select(item => item.id));

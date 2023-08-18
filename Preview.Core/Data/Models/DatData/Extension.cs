@@ -22,14 +22,11 @@ public static class Extension
 
 	public static Datafile ExtractBin(this BNSDat bNSDat)
 	{
-		var file = bNSDat.FileTable.Find(f => f.FilePath.RegexMatch(".*?.bin"));
+		using var file = bNSDat.FileTable.Find(f => f.FilePath.RegexMatch(".*?.bin"));
 		ArgumentNullException.ThrowIfNull(file);
 
 		file.Decrypt();
-		var datafile = Datafile.ReadFromBytes(file.Data, is64Bit: bNSDat.Bit64);
-
-		file.Dispose();
-		return datafile;
+		return Datafile.ReadFromBytes(file.Data, is64Bit: bNSDat.Bit64);
 	}
 	#endregion
 

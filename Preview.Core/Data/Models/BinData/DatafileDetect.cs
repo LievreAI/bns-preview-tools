@@ -1,11 +1,19 @@
-﻿using System.Text;
+﻿using System.Globalization;
+using System.Text;
 
 using BnsBinTool.Core.Definitions;
 using BnsBinTool.Core.Models;
 
+using CsvHelper;
+using CsvHelper.Configuration;
+
+using Xylia.Configure;
 using Xylia.Extension;
+using Xylia.Preview.Common.Struct;
+using Xylia.Preview.Data.Helper;
 using Xylia.Preview.Data.Models.BinData.AliasTable;
 using Xylia.Preview.Data.Models.BinData.Table.Config;
+using Xylia.Preview.Properties;
 
 using RecordModel = BnsBinTool.Core.Models.Record;
 using TableModel = BnsBinTool.Core.Models.Table;
@@ -106,7 +114,7 @@ public sealed class DatafileDetect
 		by_name.Clear();
 		foreach (var o in by_id)
 		{
-			if (o.Value is null)
+			if (string.IsNullOrWhiteSpace(o.Value))
 				continue;
 
 			by_name[o.Value.Replace("-", null)] = (short)o.Key;
@@ -114,28 +122,26 @@ public sealed class DatafileDetect
 	}
 
 
-
 	public bool TryGetName(short key, out string name) => by_id.TryGetValue(key, out name);
 
 	public bool TryGetKey(string name, out short key) => by_name.TryGetValue(name.Replace("-", null), out key);
 	#endregion
 
-
-	#region Load
+	#region Create Map
 	/// <summary>
 	/// create map by detect data
 	/// </summary>
 	/// <param name="data"></param>
-	public void Load(Datafile data) => Load(data.Tables, data.NameTable.CreateTable());
+	public void Read(Datafile data) => Read(data.Tables, data.NameTable.CreateTable());
 
 	/// <summary>
 	/// create map by detect data
 	/// </summary>
 	/// <param name="tables"></param>
 	/// <param name="AliasTable"></param>
-	public void Load(IEnumerable<TableModel> tables, IReadOnlyDictionary<string, AliasCollection> AliasTable)
+	public void Read(IEnumerable<TableModel> tables, IReadOnlyDictionary<string, AliasCollection> AliasTable)
 	{
-		tables.ForEach(table => by_id[table.Type] = null);
+		tables.ForEach(table => by_id[table.Type] = "");
 		Parallel.ForEach(tables, table =>
 		{
 			if (table.Records.Count == 0) return;
@@ -222,52 +228,90 @@ public sealed class DatafileDetect
 			#endregion
 		});
 
-		this.CreateNameMap();
+		CreateNameMap();
 	}
 
 	/// <summary>
 	/// create temp map
 	/// </summary>
 	/// <param name="definitions"></param>
-	public void Load(List<TableDefinition> definitions)
+	public void Read(List<TableDefinition> definitions)
 	{
 		short idx = 0;
 		definitions.ForEach(def => AddList(def.Name, ++idx));
 
 		CreateNameMap();
 	}
+
+	/// <summary>
+	/// create map from directly list
+	/// </summary>
+	/// <param name="path"></param>
+	public void Read(string path = null)
+	{
+		path ??= Path.Combine(CommonPath.OutputFolder, "defs", "table.csv");
+
+		using var csv = new CsvReader(new StreamReader(path), new CsvConfiguration(CultureInfo.InvariantCulture) { HasHeaderRecord = false });
+		while (csv.Read())
+		{
+			var type = csv.GetField<short>(0);
+			var name = csv.GetField(1);
+
+			AddList(name, type);
+		}
+
+		CreateNameMap();
+	}
+	#endregion
+
+	#region Output Map
+	public void Write(TableSet set, string path = null)
+	{
+		if (Settings.TestMode == DumpMode.None || set.Header is null) return;
+
+		var config = new Ini(path ?? Path.Combine(CommonPath.OutputFolder, "defs", "table.ini"));
+		config.WriteValue("version", "ClientVersion", new FVersion(set.Header.ClientVersion));
+		config.WriteValue("version", "CreatedAt", set.Header.CreatedAt);
+
+		config.RemoveSection("table");
+		by_id.OrderBy(o => o.Key).ForEach(o => config.WriteValue("table", o.Key, o.Value));
+	}
 	#endregion
 
 
-
+	#region Convert
 	/// <summary>
 	/// convert ref table name to key
 	/// </summary>
-	public void ConvertTableName(List<TableDefinition> definitions)
+	public void ConvertName(List<TableDefinition> definitions)
 	{
 		foreach (var tableDef in definitions)
 		{
-			{
-				if (tableDef.Type == 0 && this.TryGetKey(tableDef.Name, out var type))
-					tableDef.Type = type;
-			}
+			if (tableDef.Type == 0 && this.TryGetKey(tableDef.Name, out var _type))
+				tableDef.Type = _type;
 
-			foreach (AttributeDef attr in tableDef.ExpandedAttributes.Where(o => o is AttributeDef))
+
+			foreach (var attribute in tableDef.ExpandedAttributes)
 			{
-				var TypeName = attr.ReferedTableName;
+				if (attribute is not AttributeDef myattr) continue;
+
+				var TypeName = myattr.ReferedTableName;
 				if (TypeName != null && this.TryGetKey(TypeName, out var type))
-					attr.ReferedTable = type;
+					myattr.ReferedTable = type;
 			}
 
 			foreach (var subtable in tableDef.Subtables)
 			{
-				foreach (AttributeDef attr in subtable.ExpandedAttributes.Where(o => o is AttributeDef))
+				foreach (var attribute in subtable.ExpandedAttributes)
 				{
-					var TypeName = attr.ReferedTableName;
+					if (attribute is not AttributeDef myattr) continue;
+
+					var TypeName = myattr.ReferedTableName;
 					if (TypeName != null && this.TryGetKey(TypeName, out var type))
-						attr.ReferedTable = type;
+						myattr.ReferedTable = type;
 				}
 			}
 		}
 	}
+	#endregion
 }

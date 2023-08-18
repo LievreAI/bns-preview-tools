@@ -35,7 +35,7 @@
     <PackageReference Include="OpenTK" Version="4.8.0" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.0.1" />
     <PackageReference Include="SkiaSharp" Version="2.88.3" />
-    <PackageReference Include="Xylia" Version="1.0.4.45" />
+    <PackageReference Include="Xylia" Version="1.0.4.52" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Custom\Editor\Settings.settings">

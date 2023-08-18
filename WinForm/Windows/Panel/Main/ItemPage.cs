@@ -28,13 +28,13 @@ public partial class ItemPage : UserControl
 		InitializeComponent();
 		this.TabControl.SelectedIndex = 0;
 		this.GRoot_Path.Text = CommonPath.GameFolder;
-		this.ItemPreview_Search.InputText = Ini.ReadValue("Preview", "item#searchrule");
+		this.ItemPreview_Search.InputText = Ini.Instance.ReadValue("Preview", "item#searchrule");
 	}
 	#endregion
 
 
 	#region Functions (UI)
-	public string CacheList { get => Ini.ReadValue(this.GetType(), "CacheList"); set => Ini.WriteValue(this.GetType(), "CacheList", value); }
+	public string CacheList { get => Ini.Instance.ReadValue(this.GetType(), "CacheList"); set => Ini.Instance.WriteValue(this.GetType(), "CacheList", value); }
 
 	private void ucBtnFillet1_BtnClick(object sender, EventArgs e)
 	{
@@ -234,7 +234,7 @@ public partial class ItemPage : UserControl
 		}).Start();
 	}
 
-	private void ItemPreview_Search_TextChanged(object sender, EventArgs e) => Ini.WriteValue("Preview", "item#searchrule", this.ItemPreview_Search.InputText);
+	private void ItemPreview_Search_TextChanged(object sender, EventArgs e) => Ini.Instance.WriteValue("Preview", "item#searchrule", this.ItemPreview_Search.InputText);
 	#endregion
 
 	#region Else

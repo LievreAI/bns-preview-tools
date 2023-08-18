@@ -16,7 +16,6 @@ public class DefaultProvider : IDataProvider
 	public Locale Locale { get; private set; }
 	#endregion
 
-
 	#region Methods
 	bool IDataProvider.is64Bit() => this.is64Bit;
 
@@ -46,12 +45,13 @@ public class DefaultProvider : IDataProvider
 			{
 				XmlData = xmls.FirstOrDefault(),
 				LocalData = locals.FirstOrDefault(),
-				ConfigData = configs.FirstOrDefault(),
+				//ConfigData = configs.FirstOrDefault(),
 			};
 			provider.is64Bit = provider.XmlData.Bit64;
 		}
 
 		provider.Locale = new Locale(new DirectoryInfo(FolderPath));
+		provider.ConfigData = configs.FirstOrDefault();
 		return provider;
 	}
 	#endregion

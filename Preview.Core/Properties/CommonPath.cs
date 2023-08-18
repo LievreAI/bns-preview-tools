@@ -5,32 +5,31 @@ public static class CommonPath
 {
 	public static string OutputFolder
 	{
-		get => Ini.ReadValue("Folder", "Output");
+		get => Ini.Instance.ReadValue("Folder", "Output");
 		set
 		{
 			if (Directory.Exists(value))
-				Ini.WriteValue("Folder", "Output", value);
+				Ini.Instance.WriteValue("Folder", "Output", value);
 		}
 	}
 
 	public static string GameFolder
 	{
-		get => Ini.ReadValue("Folder", "Game_Bns");
+		get => Ini.Instance.ReadValue("Folder", "Game_Bns");
 		set
 		{
 			if (Directory.Exists(value))
-				Ini.WriteValue("Folder", "Game_Bns", value);
+				Ini.Instance.WriteValue("Folder", "Game_Bns", value);
 		}
 	}
 
-	public static string DataFiles => OutputFolder + @"\data";
 
 
-
+	public static string DataFiles => Path.Combine(OutputFolder, "data");
 
 	public static string OutputFolder_Resource
 	{
-		get => Ini.ReadValue("Folder", "Output_Resource") ?? (OutputFolder + @"\Pak");
-		set => Ini.WriteValue("Folder", "Output_Resource", value);
+		get => Ini.Instance.ReadValue("Folder", "Output_Resource") ?? (OutputFolder + @"\Pak");
+		set => Ini.Instance.WriteValue("Folder", "Output_Resource", value);
 	}
 }

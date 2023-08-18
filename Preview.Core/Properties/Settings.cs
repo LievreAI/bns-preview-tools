@@ -9,14 +9,14 @@ public static class Settings
 
 	public static LoadMode LoadMode
 	{
-		get => (LoadMode)ReadValue(SEC, "load-mode").ToInt32();
-		set => WriteValue(SEC, "load-mode", (int)value);
+		get => (LoadMode)Instance.ReadValue(SEC, "load-mode").ToInt32();
+		set => Instance.WriteValue(SEC, "load-mode", (int)value);
 	}
 
 	public static DumpMode TestMode
 	{
-		get => (DumpMode)ReadValue(SEC, "test-mode").ToInt32();
-		set => WriteValue(SEC, "test-mode", (int)value);
+		get => (DumpMode)Instance.ReadValue(SEC, "test-mode").ToInt32();
+		set => Instance.WriteValue(SEC, "test-mode", (int)value);
 	}
 }
 
@@ -50,7 +50,7 @@ public enum Moudle
 
 	CombatData = 14,
 
-	CraftRecipe = 38,     
+	CraftRecipe = 38,
 
 	ArenaPortal = 70,
 

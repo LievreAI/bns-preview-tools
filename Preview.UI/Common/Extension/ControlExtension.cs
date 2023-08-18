@@ -12,7 +12,7 @@ public static class ControlExtension
 		{
 			c.ReadConfig();
 
-			var val = Ini.ReadValue("Config", c.GetKey());
+			var val = Ini.Instance.ReadValue("Config", c.GetKey());
 			if (string.IsNullOrWhiteSpace(val)) continue;
 
 			if (c is CheckBox checkBox) checkBox.Checked = val.ToBool();
@@ -22,7 +22,7 @@ public static class ControlExtension
 
 	public static void SaveConfig(this Control c)
 	{
-		Ini.WriteValue("Config", c.GetKey(), c.Text);
+		Ini.Instance.WriteValue("Config", c.GetKey(), c.Text);
 	}
 
 
